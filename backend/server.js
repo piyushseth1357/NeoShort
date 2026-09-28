@@ -109,6 +109,19 @@ function saveDb(data) {
 
 // ---------------- ROUTES ----------------
 
+// Root Welcome Route
+app.get('/', (req, res) => {
+  res.json({
+    status: 'online',
+    message: 'NeoShort AI Autonomous YouTube Shorts Engine is Active & Running 24x7!',
+    endpoints: {
+      health: '/api/health',
+      trends: '/api/trends/detect',
+      videos: '/api/videos'
+    }
+  });
+});
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', service: 'NeoShort Autonomous Backend', time: new Date() });
