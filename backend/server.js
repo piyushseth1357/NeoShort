@@ -6,6 +6,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { generateShortScript } from './pipeline/scriptGenerator.js';
 import { generateVoiceover } from './pipeline/voiceGenerator.js';
+import { startAutopilotScheduler, processAutopilotBatch } from './pipeline/autopilotScheduler.js';
 
 dotenv.config();
 
@@ -323,6 +324,14 @@ app.get('/api/user/profile', (req, res) => {
   });
 });
 
+// Autopilot status & on-demand trigger
+app.post('/api/autopilot/trigger', async (req, res) => {
+  const results = await processAutopilotBatch(getDb, saveDb);
+  res.json({ success: true, message: "Autopilot batch executed successfully across all channels!", results });
+});
+
 app.listen(PORT, () => {
   console.log(`NeoShort Autonomous Backend running on http://localhost:${PORT}`);
+  // Start the 24/7 autonomous daily scheduler
+  startAutopilotScheduler(getDb, saveDb);
 });
