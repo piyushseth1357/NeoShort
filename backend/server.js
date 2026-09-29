@@ -265,12 +265,17 @@ app.post('/api/pipeline/generate-and-upload', (req, res) => {
     tags: ["#shorts", "#viral", "#facts", "#mysteries", "#trending", "#neoshort"]
   };
 
+  // User-requested Auto-Pruning: Keep ONLY the latest 5 videos to ensure zero storage waste!
+  // Once Video #6 is added, Video #1 is automatically purged since it is already live on YouTube!
   db.videos.unshift(newVideo);
+  if (db.videos.length > 5) {
+    db.videos = db.videos.slice(0, 5);
+  }
   saveDb(db);
 
   res.json({
     success: true,
-    message: uploadNow ? "Video generated & auto-uploaded directly to YouTube Channel!" : "Video generated and scheduled for peak viewing time!",
+    message: uploadNow ? "Video generated & auto-uploaded directly to YouTube Channel!" : "Video generated and scheduled for peak viewing time! (Latest 5 videos buffer maintained)",
     video: newVideo
   });
 });
