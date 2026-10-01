@@ -6,13 +6,57 @@
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "orientation": "portrait",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui"
+  ],
+  "orientation": "portrait-primary",
+  "lang": "en",
+  "dir": "ltr",
   "background_color": "#08080c",
   "theme_color": "#ff2d55",
   "categories": [
     "productivity",
     "utilities",
     "video"
+  ],
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7",
+  "scope_extensions": [
+    {
+      "origin": "*.vercel.app"
+    },
+    {
+      "origin": "*.onrender.com"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Creator Dashboard",
+      "short_name": "Dashboard",
+      "description": "View YouTube channel analytics and scheduled videos",
+      "url": "/?view=dashboard",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Generate Short Now",
+      "short_name": "Generate",
+      "description": "Trigger instant viral video generation pipeline",
+      "url": "/?action=generate",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
   ],
   "icons": [
     {
