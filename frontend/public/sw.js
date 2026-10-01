@@ -1,9 +1,14 @@
-const CACHE_NAME = 'neoshort-v1';
+const CACHE_NAME = 'neoshort-v2';
 const urlsToCache = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/logo.png'
+  '/logo.png',
+  '/icon-192.png',
+  '/icon-512.png',
+  '/icon-maskable.png',
+  '/screenshot-wide.png',
+  '/screenshot-mobile.png'
 ];
 
 self.addEventListener('install', (event) => {
