@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { X, CheckCircle2, ShieldCheck, Sparkles, Layers, Sliders } from 'lucide-react';
 import Youtube from './YoutubeIcon';
 
+import { apiConnectChannel } from '../api';
+
 export default function ConnectChannelModal({ isOpen, onClose, onChannelConnected }) {
   const [channelName, setChannelName] = useState('');
   const [handle, setHandle] = useState('');
@@ -10,16 +12,32 @@ export default function ConnectChannelModal({ isOpen, onClose, onChannelConnecte
 
   if (!isOpen) return null;
 
-  const handleConnect = (e) => {
+  const handleConnect = async (e) => {
     e.preventDefault();
     setConnecting(true);
 
-    setTimeout(() => {
-      setConnecting(false);
-      const newChannel = {
+    const formattedHandle = handle ? (handle.startsWith('@') ? handle : '@' + handle) : '@' + (channelName ? channelName.toLowerCase().replace(/\s+/g, '') : 'neocreator');
+    
+    // Call backend API to persist in MongoDB database
+    let createdChannel = null;
+    try {
+      const response = await apiConnectChannel({
+        channelName: channelName || "Neo Channel",
+        handle: formattedHandle,
+        niche: niche
+      });
+      if (response && response.channel) {
+        createdChannel = response.channel;
+      }
+    } catch (err) {
+      console.warn("Backend connect error, using local fallback", err);
+    }
+
+    if (!createdChannel) {
+      createdChannel = {
         id: "UC_" + Math.random().toString(36).substring(2, 10),
         title: channelName || "Neo Channel",
-        handle: handle ? (handle.startsWith('@') ? handle : '@' + handle) : '@neocreator',
+        handle: formattedHandle,
         subscribers: "1 (Connected)",
         avatar: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150&auto=format&fit=crop&q=80",
         niche: niche,
@@ -30,9 +48,11 @@ export default function ConnectChannelModal({ isOpen, onClose, onChannelConnecte
         lastUploaded: "Pending first daily batch",
         totalUploads: 0
       };
-      onChannelConnected(newChannel);
-      onClose();
-    }, 1200);
+    }
+
+    setConnecting(false);
+    onChannelConnected(createdChannel);
+    onClose();
   };
 
   const niches = [

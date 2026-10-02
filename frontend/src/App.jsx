@@ -11,85 +11,245 @@ import ConnectChannelModal from './components/ConnectChannelModal';
 import GenerateVideoModal from './components/GenerateVideoModal';
 import Youtube from './components/YoutubeIcon';
 import { Heart, Smartphone, Monitor, Shield, Sparkles } from 'lucide-react';
+import { apiFetchUserProfile, apiFetchVideos } from './api';
+
+const STORAGE_KEYS = {
+  CHANNELS: 'neoshort_v1_channels',
+  ACTIVE_CHANNEL: 'neoshort_v1_active_channel',
+  VIDEOS: 'neoshort_v1_videos',
+  CURRENT_VIEW: 'neoshort_v1_current_view',
+  USER: 'neoshort_v1_user',
+  HAS_CUSTOM: 'neoshort_v1_has_custom'
+};
+
+const defaultChannels = [
+  {
+    id: "UC_demo_987654321",
+    title: "NeoFacts Official",
+    handle: "@neofactsofficial",
+    subscribers: "12.4K",
+    avatar: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150&auto=format&fit=crop&q=80",
+    niche: "Mind-Blowing Facts & Science",
+    status: "Connected & Active",
+    autoMode: true,
+    bestPostingTime: "18:45 IST (Peak Engagement)",
+    dailyUploadLimit: 2,
+    lastUploaded: "Today, 18:45 IST",
+    totalUploads: 28
+  }
+];
+
+const defaultVideos = [
+  {
+    id: "vid_101",
+    title: "Why Time Moves Slower on Mount Everest 🏔️⌛ #shorts #facts #science",
+    channelId: "UC_demo_987654321",
+    channelName: "NeoFacts Official",
+    niche: "Mind-Blowing Facts & Science",
+    status: "Uploaded",
+    views: "184.2K",
+    likes: "14.3K",
+    comments: "492",
+    scheduledFor: "Today, 18:45 IST",
+    uploadedAt: "Today, 18:45 IST",
+    retentionScore: "89% (High Retention)",
+    duration: "0:42",
+    thumbnail: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&auto=format&fit=crop&q=80",
+    scriptHook: "Did you know that your head ages faster than your feet? Einstein proved it...",
+    tags: ["#shorts", "#facts", "#science", "#timetravel", "#mindblown", "#trending"]
+  },
+  {
+    id: "vid_102",
+    title: "The Bizarre AI Discovery Nobody Talks About 🤖🤯 #shorts #ai #tech",
+    channelId: "UC_demo_987654321",
+    channelName: "NeoFacts Official",
+    niche: "AI & Tech News",
+    status: "Scheduled",
+    views: "Queued",
+    likes: "-",
+    comments: "-",
+    scheduledFor: "Tomorrow, 18:45 IST (Peak Window)",
+    uploadedAt: null,
+    retentionScore: "94% (Predicted Retention)",
+    duration: "0:38",
+    thumbnail: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=600&auto=format&fit=crop&q=80",
+    scriptHook: "Quantum computers just simulated something that shouldn't exist in our universe...",
+    tags: ["#shorts", "#ai", "#technology", "#futuretech", "#quantum"]
+  }
+];
 
 export default function App() {
-  const [currentView, setCurrentView] = useState('landing'); // 'landing' | 'dashboard'
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isConnectOpen, setIsConnectOpen] = useState(false);
   const [isGenerateOpen, setIsGenerateOpen] = useState(false);
 
-  // User state
-  const [user, setUser] = useState({
-    id: "usr_demo",
-    name: "Aarav Creator",
-    email: "creator@neoshort.ai"
+  // Permanent Persistent User
+  const [user, setUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.USER);
+      return saved ? JSON.parse(saved) : {
+        id: "usr_creator",
+        name: "Creator",
+        email: "creator@neoshort.ai"
+      };
+    } catch {
+      return { id: "usr_creator", name: "Creator", email: "creator@neoshort.ai" };
+    }
   });
 
-  const [channels, setChannels] = useState([
-    {
-      id: "UC_demo_987654321",
-      title: "NeoFacts Official",
-      handle: "@neofactsofficial",
-      subscribers: "12.4K",
-      avatar: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150&auto=format&fit=crop&q=80",
-      niche: "Mind-Blowing Facts & Science",
-      status: "Connected & Active",
-      autoMode: true,
-      bestPostingTime: "18:45 IST (Peak Engagement)",
-      dailyUploadLimit: 2,
-      lastUploaded: "Today, 18:45 IST",
-      totalUploads: 28
+  // Permanent Persistent Channels
+  const [channels, setChannels] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.CHANNELS);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+      return defaultChannels;
+    } catch {
+      return defaultChannels;
     }
-  ]);
+  });
 
-  const [activeChannel, setActiveChannel] = useState(channels[0]);
-
-  const [videos, setVideos] = useState([
-    {
-      id: "vid_101",
-      title: "Why Time Moves Slower on Mount Everest 🏔️⌛ #shorts #facts #science",
-      channelId: "UC_demo_987654321",
-      channelName: "NeoFacts Official",
-      niche: "Mind-Blowing Facts & Science",
-      status: "Uploaded",
-      views: "184.2K",
-      likes: "14.3K",
-      comments: "492",
-      scheduledFor: "Today, 18:45 IST",
-      uploadedAt: "Today, 18:45 IST",
-      retentionScore: "89% (High Retention)",
-      duration: "0:42",
-      thumbnail: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&auto=format&fit=crop&q=80",
-      scriptHook: "Did you know that your head ages faster than your feet? Einstein proved it...",
-      tags: ["#shorts", "#facts", "#science", "#timetravel", "#mindblown", "#trending"]
-    },
-    {
-      id: "vid_102",
-      title: "The Bizarre AI Discovery Nobody Talks About 🤖🤯 #shorts #ai #tech",
-      channelId: "UC_demo_987654321",
-      channelName: "NeoFacts Official",
-      niche: "AI & Tech News",
-      status: "Scheduled",
-      views: "Queued",
-      likes: "-",
-      comments: "-",
-      scheduledFor: "Tomorrow, 18:45 IST (Peak Window)",
-      uploadedAt: null,
-      retentionScore: "94% (Predicted Retention)",
-      duration: "0:38",
-      thumbnail: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=600&auto=format&fit=crop&q=80",
-      scriptHook: "Quantum computers just simulated something that shouldn't exist in our universe...",
-      tags: ["#shorts", "#ai", "#technology", "#futuretech", "#quantum"]
+  // Permanent Persistent Active Channel
+  const [activeChannel, setActiveChannel] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.ACTIVE_CHANNEL);
+      if (saved) return JSON.parse(saved);
+      return channels[0] || defaultChannels[0];
+    } catch {
+      return channels[0] || defaultChannels[0];
     }
-  ]);
+  });
+
+  // Permanent Persistent Videos
+  const [videos, setVideos] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.VIDEOS);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+      return defaultVideos;
+    } catch {
+      return defaultVideos;
+    }
+  });
+
+  // Permanent View (If user already connected a channel, open Dashboard directly!)
+  const [currentView, setCurrentView] = useState(() => {
+    try {
+      const hasCustom = localStorage.getItem(STORAGE_KEYS.HAS_CUSTOM);
+      const savedView = localStorage.getItem(STORAGE_KEYS.CURRENT_VIEW);
+      if (hasCustom === 'true') {
+        return 'dashboard';
+      }
+      return savedView || 'landing';
+    } catch {
+      return 'landing';
+    }
+  });
+
+  // Save changes to localStorage whenever state updates
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEYS.CHANNELS, JSON.stringify(channels));
+    } catch (e) {
+      console.warn("Storage write error", e);
+    }
+  }, [channels]);
+
+  useEffect(() => {
+    try {
+      if (activeChannel) {
+        localStorage.setItem(STORAGE_KEYS.ACTIVE_CHANNEL, JSON.stringify(activeChannel));
+      }
+    } catch (e) {
+      console.warn("Storage write error", e);
+    }
+  }, [activeChannel]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEYS.VIDEOS, JSON.stringify(videos));
+    } catch (e) {
+      console.warn("Storage write error", e);
+    }
+  }, [videos]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEYS.CURRENT_VIEW, currentView);
+    } catch (e) {
+      console.warn("Storage write error", e);
+    }
+  }, [currentView]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
+    } catch (e) {
+      console.warn("Storage write error", e);
+    }
+  }, [user]);
+
+  // Background Cloud Sync: syncs cloud-generated videos or channels
+  useEffect(() => {
+    async function syncCloudData() {
+      try {
+        const backendProfile = await apiFetchUserProfile();
+        if (backendProfile && backendProfile.user && Array.isArray(backendProfile.user.connectedChannels) && backendProfile.user.connectedChannels.length > 0) {
+          const cloudChannels = backendProfile.user.connectedChannels;
+          setChannels(prev => {
+            // merge keeping unique ids
+            const map = new Map();
+            cloudChannels.forEach(c => map.set(c.id, c));
+            prev.forEach(c => { if (!map.has(c.id)) map.set(c.id, c); });
+            const merged = Array.from(map.values());
+            localStorage.setItem(STORAGE_KEYS.CHANNELS, JSON.stringify(merged));
+            return merged;
+          });
+        }
+
+        const backendVideos = await apiFetchVideos();
+        if (backendVideos && Array.isArray(backendVideos.videos) && backendVideos.videos.length > 0) {
+          setVideos(prev => {
+            const map = new Map();
+            backendVideos.videos.forEach(v => map.set(v.id, v));
+            prev.forEach(v => { if (!map.has(v.id)) map.set(v.id, v); });
+            const merged = Array.from(map.values()).slice(0, 5); // 5-video rolling buffer
+            localStorage.setItem(STORAGE_KEYS.VIDEOS, JSON.stringify(merged));
+            return merged;
+          });
+        }
+      } catch (err) {
+        console.log("Offline mode or cloud sync skipped:", err.message);
+      }
+    }
+    syncCloudData();
+  }, []);
 
   const handleChannelConnected = (newChannel) => {
-    setChannels(prev => [newChannel, ...prev]);
+    setChannels(prev => {
+      // Put user's new channel at the top
+      const filtered = prev.filter(c => c.id !== newChannel.id && c.id !== "UC_demo_987654321");
+      const updated = [newChannel, ...filtered];
+      localStorage.setItem(STORAGE_KEYS.CHANNELS, JSON.stringify(updated));
+      return updated;
+    });
     setActiveChannel(newChannel);
+    localStorage.setItem(STORAGE_KEYS.ACTIVE_CHANNEL, JSON.stringify(newChannel));
+    localStorage.setItem(STORAGE_KEYS.HAS_CUSTOM, 'true');
+    setCurrentView('dashboard');
+    localStorage.setItem(STORAGE_KEYS.CURRENT_VIEW, 'dashboard');
   };
 
   const handleVideoCreated = (newVideo) => {
-    setVideos(prev => [newVideo, ...prev]);
+    setVideos(prev => {
+      const updated = [newVideo, ...prev].slice(0, 5); // strictly keep latest 5
+      localStorage.setItem(STORAGE_KEYS.VIDEOS, JSON.stringify(updated));
+      return updated;
+    });
   };
 
   return (
@@ -98,10 +258,16 @@ export default function App() {
       {/* Top Navbar */}
       <Navbar 
         onOpenAuth={() => setIsAuthOpen(true)}
-        onOpenDashboard={() => setCurrentView('dashboard')}
+        onOpenDashboard={() => {
+          setCurrentView('dashboard');
+          localStorage.setItem(STORAGE_KEYS.CURRENT_VIEW, 'dashboard');
+        }}
         isLoggedIn={true}
         currentView={currentView}
-        setCurrentView={setCurrentView}
+        setCurrentView={(view) => {
+          setCurrentView(view);
+          localStorage.setItem(STORAGE_KEYS.CURRENT_VIEW, view);
+        }}
       />
 
       {/* Main View Switcher */}
@@ -109,12 +275,18 @@ export default function App() {
         {currentView === 'landing' ? (
           <>
             <Hero 
-              onOpenDashboard={() => setCurrentView('dashboard')} 
+              onOpenDashboard={() => {
+                setCurrentView('dashboard');
+                localStorage.setItem(STORAGE_KEYS.CURRENT_VIEW, 'dashboard');
+              }} 
               onOpenAuth={() => setIsAuthOpen(true)} 
             />
             <ShortsPreview />
             <Features />
-            <HowItWorks onLaunch={() => setCurrentView('dashboard')} />
+            <HowItWorks onLaunch={() => {
+              setCurrentView('dashboard');
+              localStorage.setItem(STORAGE_KEYS.CURRENT_VIEW, 'dashboard');
+            }} />
             <DownloadSection />
           </>
         ) : (
@@ -122,7 +294,10 @@ export default function App() {
             user={user}
             channels={channels}
             activeChannel={activeChannel}
-            setActiveChannel={setActiveChannel}
+            setActiveChannel={(ch) => {
+              setActiveChannel(ch);
+              localStorage.setItem(STORAGE_KEYS.ACTIVE_CHANNEL, JSON.stringify(ch));
+            }}
             videos={videos}
             onOpenConnectChannel={() => setIsConnectOpen(true)}
             onOpenGenerate={() => setIsGenerateOpen(true)}
@@ -145,7 +320,10 @@ export default function App() {
             <a href="#features" onClick={() => setCurrentView('landing')} className="hover:text-white transition">Features</a>
             <a href="#how-it-works" onClick={() => setCurrentView('landing')} className="hover:text-white transition">How it Works</a>
             <a href="#downloads" onClick={() => setCurrentView('landing')} className="hover:text-white transition">Downloads</a>
-            <button onClick={() => setCurrentView('dashboard')} className="hover:text-[#ff2d55] transition font-semibold">Web Dashboard</button>
+            <button onClick={() => {
+              setCurrentView('dashboard');
+              localStorage.setItem(STORAGE_KEYS.CURRENT_VIEW, 'dashboard');
+            }} className="hover:text-[#ff2d55] transition font-semibold">Web Dashboard</button>
           </div>
 
           <div className="text-xs text-gray-500 text-center md:text-right">
@@ -161,7 +339,9 @@ export default function App() {
         onClose={() => setIsAuthOpen(false)}
         onLoginSuccess={(usr) => {
           setUser(usr);
+          localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(usr));
           setCurrentView('dashboard');
+          localStorage.setItem(STORAGE_KEYS.CURRENT_VIEW, 'dashboard');
         }}
       />
 

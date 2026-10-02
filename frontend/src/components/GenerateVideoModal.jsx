@@ -26,7 +26,7 @@ export default function GenerateVideoModal({ isOpen, onClose, channel, onVideoCr
     }
 
     let currentStage = 0;
-    const interval = setInterval(() => {
+    const interval = setInterval(async () => {
       currentStage += 1;
       if (currentStage < stages.length) {
         setStage(currentStage);
@@ -39,24 +39,42 @@ export default function GenerateVideoModal({ isOpen, onClose, channel, onVideoCr
           origin: { y: 0.6 }
         });
 
-        const newVid = {
-          id: "vid_" + Date.now(),
-          title: (topic || "The Hidden Secret of Deep Oceans") + " 🌊🤯 #shorts #facts #viral",
-          channelId: channel?.id || "UC_demo",
-          channelName: channel?.title || "NeoShorts Creator",
-          niche: channel?.niche || "Mind-Blowing Facts",
-          status: "Scheduled & Live",
-          views: "1.2K (Fresh)",
-          likes: "148",
-          comments: "19",
-          scheduledFor: "Today, 18:45 IST (Peak Audience Hour)",
-          uploadedAt: "Just now",
-          retentionScore: "94% (Predicted High Retention)",
-          duration: "0:44",
-          thumbnail: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80",
-          scriptHook: "Scientists sent a probe 35,000 feet into the Mariana Trench and captured a sound never heard before...",
-          tags: ["#shorts", "#facts", "#mystery", "#science", "#viral", "#neoshort"]
-        };
+        let newVid = null;
+        try {
+          const res = await apiGenerateAndUpload({
+            channelId: channel?.id || "UC_demo",
+            niche: channel?.niche || "Mind-Blowing Facts & Science",
+            topic: topic || undefined,
+            uploadNow: false
+          });
+          if (res && res.video) {
+            newVid = res.video;
+          }
+        } catch (e) {
+          console.warn("Backend generation error, using fallback", e);
+        }
+
+        if (!newVid) {
+          newVid = {
+            id: "vid_" + Date.now(),
+            title: (topic || "The Hidden Secret of Deep Oceans") + " 🌊🤯 #shorts #facts #viral",
+            channelId: channel?.id || "UC_demo",
+            channelName: channel?.title || "NeoShorts Creator",
+            niche: channel?.niche || "Mind-Blowing Facts",
+            status: "Scheduled & Live",
+            views: "1.2K (Fresh)",
+            likes: "148",
+            comments: "19",
+            scheduledFor: "Today, 18:45 IST (Peak Audience Hour)",
+            uploadedAt: "Just now",
+            retentionScore: "94% (Predicted High Retention)",
+            duration: "0:44",
+            thumbnail: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80",
+            scriptHook: "Scientists sent a probe 35,000 feet into the Mariana Trench and captured a sound never heard before...",
+            tags: ["#shorts", "#facts", "#mystery", "#science", "#viral", "#neoshort"]
+          };
+        }
+
         setGeneratedVideo(newVid);
         onVideoCreated(newVid);
       }
