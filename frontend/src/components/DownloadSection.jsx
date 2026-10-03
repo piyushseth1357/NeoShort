@@ -76,25 +76,16 @@ export default function DownloadSection() {
             </div>
 
             <div>
-              <button
-                onClick={() => handleFakeDownload('Android', 'NeoShort-Mobile-v1.2.0.apk')}
-                disabled={downloading === 'Android'}
-                className="w-full py-3.5 px-6 rounded-xl font-bold text-sm bg-gradient-to-r from-[#ff2d55] to-[#c70039] hover:from-[#ff4065] hover:to-[#e50914] text-white shadow-neo flex items-center justify-center gap-2.5 transition active:scale-95"
+              <a
+                href="/neoshort.apk"
+                download="NeoShort.apk"
+                className="w-full py-3.5 px-6 rounded-xl font-bold text-sm bg-gradient-to-r from-[#ff2d55] to-[#c70039] hover:from-[#ff4065] hover:to-[#e50914] text-white shadow-neo flex items-center justify-center gap-2.5 transition active:scale-95 text-center"
               >
-                {downloading === 'Android' ? (
-                  <span className="flex items-center gap-2">
-                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                    Downloading APK...
-                  </span>
-                ) : (
-                  <>
-                    <ArrowDownToLine className="w-4 h-4" />
-                    <span>Download APK (48 MB)</span>
-                  </>
-                )}
-              </button>
+                <ArrowDownToLine className="w-4 h-4" />
+                <span>Download Android APK (31.6 MB)</span>
+              </a>
               <p className="text-[11px] text-gray-500 text-center mt-2.5">
-                Safe & Verified APK • SHA-256 Checksum Verified
+                Safe & Verified APK • Direct Install for All Android Phones
               </p>
             </div>
           </div>
