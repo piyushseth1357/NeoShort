@@ -8,6 +8,7 @@
     <meta name="description" content="Auto-generate and auto-upload daily YouTube Shorts for your channels on peak audience viewing hours." />
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#ff2d55" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,13 +17,47 @@
   </head>
   <body class="bg-[#08080c] text-white">
     <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+
     <script>
+      // Self-healing: If any bundled asset fails to load (e.g. stale SW cache pointing to old hash), purge caches and reload
+      window.addEventListener('error', function (event) {
+        if (event.target && (event.target.tagName === 'SCRIPT' || event.target.tagName === 'LINK')) {
+          console.warn('[NeoShort] Stale asset load detected. Purging cache and reloading...');
+          if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function (registrations) {
+              for (var i = 0; i < registrations.length; i++) {
+                registrations[i].unregister();
+              }
+              if ('caches' in window) {
+                caches.keys().then(function (keys) {
+                  return Promise.all(keys.map(function (k) { return caches.delete(k); }));
+                }).then(function () {
+                  window.location.reload();
+                });
+              } else {
+                window.location.reload();
+              }
+            });
+          }
+        }
+      }, true);
+
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js');
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.register('/sw.js').then(function (reg) {
+            reg.update();
+          });
+        });
+
+        var refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', function () {
+          if (!refreshing) {
+            refreshing = true;
+            window.location.reload();
+          }
         });
       }
     </script>
+    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
