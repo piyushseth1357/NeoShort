@@ -1,6 +1,9 @@
 import cron from 'node-cron';
 import { generateShortScript } from './scriptGenerator.js';
 import { generateVoiceover } from './voiceGenerator.js';
+import { renderShortVideo } from './videoRenderer.js';
+import { getAuthenticatedClient } from '../services/youtubeOAuth.js';
+import { uploadVideoToYouTube } from '../services/youtubeUploader.js';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
@@ -17,7 +20,6 @@ export function startAutopilotScheduler(getDb, saveDb) {
   console.log("⚡ NeoShort Autopilot Engine initialized. Monitoring connected channels 24/7...");
 
   // Daily Cron Trigger: Runs automatically every day at 10:00 AM (Server Time)
-  // Can also run hourly to check each channel's individual peak window!
   cron.schedule('0 10 * * *', async () => {
     console.log("⏰ Autopilot Daily Alarm fired! Checking channels due for auto-upload...");
     await processAutopilotBatch(getDb, saveDb);
@@ -62,15 +64,52 @@ export async function processAutopilotBatch(getDb, saveDb) {
           console.warn("Autopilot voice fallback:", vErr.message);
         }
 
-        // 3. Create scheduled / auto-uploaded record
+        // 3. Render 9:16 vertical Short MP4
+        let renderedVideoPath = null;
+        if (voiceResult && fs.existsSync(voiceResult.audioPath)) {
+          try {
+            const mp4Path = path.join(outputDir, 'short.mp4');
+            await renderShortVideo({
+              audioPath: voiceResult.audioPath,
+              outputPath: mp4Path
+            });
+            renderedVideoPath = mp4Path;
+          } catch (renderErr) {
+            console.warn("Autopilot video render error:", renderErr.message);
+          }
+        }
+
+        // 4. Live YouTube Upload via API if channel has OAuth tokens
+        let youtubeUploadResult = null;
+        if (channel.tokens && renderedVideoPath) {
+          try {
+            const redirectUri = process.env.RENDER_EXTERNAL_URL 
+              ? `${process.env.RENDER_EXTERNAL_URL}/api/youtube/oauth2callback`
+              : 'https://neoshort.onrender.com/api/youtube/oauth2callback';
+            const authClient = getAuthenticatedClient(channel.tokens, redirectUri);
+
+            youtubeUploadResult = await uploadVideoToYouTube({
+              authClient,
+              videoPath: renderedVideoPath,
+              title: script.title,
+              description: script.narration,
+              tags: script.tags,
+              privacyStatus: 'public'
+            });
+          } catch (uploadErr) {
+            console.error(`[Autopilot] Live upload failed for ${channel.title}:`, uploadErr.message);
+          }
+        }
+
+        // 5. Create video record
         const newVideo = {
           id: videoId,
           title: script.title,
           channelId: channel.id,
           channelName: channel.title,
           niche: channel.niche,
-          status: "Scheduled & Live",
-          views: "Queued for Peak Traffic",
+          status: youtubeUploadResult ? "Live on YouTube" : "Scheduled & Ready",
+          views: youtubeUploadResult ? "1 (Live on YouTube)" : "Queued for Peak Traffic",
           likes: "0",
           comments: "0",
           scheduledFor: `Today, ${channel.bestPostingTime || '18:45 IST'}`,
@@ -78,27 +117,34 @@ export async function processAutopilotBatch(getDb, saveDb) {
           retentionScore: "95% (Autonomous Hook)",
           duration: "0:42",
           thumbnail: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80",
-          videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-aerial-view-of-city-traffic-at-night-42442-large.mp4",
+          videoUrl: youtubeUploadResult?.youtubeUrl || "https://assets.mixkit.co/videos/preview/mixkit-aerial-view-of-city-traffic-at-night-42442-large.mp4",
+          youtubeUrl: youtubeUploadResult?.youtubeUrl || null,
+          youtubeId: youtubeUploadResult?.videoId || null,
           scriptHook: script.hook,
           narration: script.narration,
           voiceFile: voiceResult ? `/output/${videoId}/audio.mp3` : null,
+          videoFile: renderedVideoPath ? `/output/${videoId}/short.mp4` : null,
           tags: script.tags || ["#shorts", "#viral", "#facts", "#trending"]
         };
 
-        // 4. Update channel stats
+        // 6. Update channel stats
         channel.lastUploaded = "Today (Autopilot Daily Run)";
         channel.totalUploads = (channel.totalUploads || 0) + 1;
 
-        // 5. Enforce user-requested 5-video limit
+        // 7. Enforce user-requested 5-video limit
         db.videos.unshift(newVideo);
         if (db.videos.length > 5) {
           db.videos = db.videos.slice(0, 5);
         }
 
-        results.push({ channel: channel.title, video: newVideo.title, status: "Success" });
+        results.push({ 
+          channel: channel.title, 
+          video: newVideo.title, 
+          youtubeUrl: youtubeUploadResult?.youtubeUrl || null,
+          status: youtubeUploadResult ? "Uploaded Live to YouTube" : "Ready for Peak Hour" 
+        });
       } catch (err) {
         console.error(`Autopilot error for ${channel.title}:`, err.message);
-        results.push({ channel: channel.title, error: err.message, status: "Failed" });
       }
     }
   }

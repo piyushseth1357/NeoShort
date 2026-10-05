@@ -1,6 +1,17 @@
 // NeoShort API Client
 const API_BASE_URL = (import.meta.env.VITE_API_URL || 'https://neoshort.onrender.com').replace(/\/+$/, '');
 
+export async function apiGetGoogleAuthUrl(params = {}) {
+  try {
+    const query = new URLSearchParams(params).toString();
+    const res = await fetch(`${API_BASE_URL}/api/youtube/auth-url?${query}`);
+    return await res.json();
+  } catch (err) {
+    console.warn("Backend auth-url offline:", err);
+    return null;
+  }
+}
+
 export async function apiConnectChannel(channelData) {
   try {
     const res = await fetch(`${API_BASE_URL}/api/youtube/connect`, {

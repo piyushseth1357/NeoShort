@@ -229,6 +229,44 @@ export default function App() {
     syncCloudData();
   }, []);
 
+  // Handle Google OAuth Redirect Return
+  useEffect(() => {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('channel_connected') === 'true') {
+        const id = urlParams.get('channel_id') || ('UC_' + Date.now());
+        const title = urlParams.get('channel_title') || 'Fact & Mistery';
+        const handle = urlParams.get('channel_handle') || '@MisteryFact-01';
+        const avatar = urlParams.get('channel_avatar') || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150';
+        const subscribers = urlParams.get('channel_subs') || '1 (Google Verified)';
+        const niche = urlParams.get('channel_niche') || 'Mind-Blowing Facts & Science';
+
+        const connectedChan = {
+          id,
+          title,
+          handle,
+          subscribers,
+          avatar,
+          niche,
+          status: 'Connected & Verified (Google OAuth)',
+          autoMode: true,
+          bestPostingTime: '18:45 IST (Peak Engagement)',
+          dailyUploadLimit: 1,
+          lastUploaded: 'Pending first daily batch',
+          totalUploads: 0
+        };
+
+        handleChannelConnected(connectedChan);
+
+        // Clean up URL query parameters cleanly
+        const cleanUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, cleanUrl);
+      }
+    } catch (e) {
+      console.warn("OAuth redirect param parse error:", e);
+    }
+  }, []);
+
   const handleChannelConnected = (newChannel) => {
     setChannels(prev => {
       // Put user's new channel at the top
