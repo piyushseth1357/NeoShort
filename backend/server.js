@@ -190,8 +190,8 @@ app.get('/api/youtube/auth-url', (req, res) => {
   }
 });
 
-// YouTube OAuth: Redirect Callback URL
-app.get('/api/youtube/oauth2callback', async (req, res) => {
+// YouTube OAuth: Redirect Callback URL (supports both oauth2callback and callback)
+app.get(['/api/youtube/oauth2callback', '/api/youtube/callback'], async (req, res) => {
   try {
     const { code, state: stateStr } = req.query;
     if (!code) {
@@ -207,7 +207,7 @@ app.get('/api/youtube/oauth2callback', async (req, res) => {
 
     const host = req.get('host');
     const protocol = req.protocol === 'https' || req.get('x-forwarded-proto') === 'https' ? 'https' : 'http';
-    const redirectUri = `${protocol}://${host}/api/youtube/oauth2callback`;
+    const redirectUri = `${protocol}://${host}${req.path}`;
 
     const tokens = await getTokensFromCode(code, redirectUri);
     const authClient = getAuthenticatedClient(tokens, redirectUri);
