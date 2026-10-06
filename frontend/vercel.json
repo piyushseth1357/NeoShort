@@ -1,5 +1,6 @@
 {
   "rewrites": [
+    { "source": "/google4cce5b7ee4c1ac02.html", "destination": "/google4cce5b7ee4c1ac02.html" },
     { "source": "/privacy", "destination": "/privacy.html" },
     { "source": "/terms", "destination": "/terms.html" },
     { "source": "/(.*)", "destination": "/index.html" }
