@@ -11,7 +11,7 @@ import ConnectChannelModal from './components/ConnectChannelModal';
 import GenerateVideoModal from './components/GenerateVideoModal';
 import Youtube from './components/YoutubeIcon';
 import { Heart, Smartphone, Monitor, Shield, Sparkles } from 'lucide-react';
-import { apiFetchUserProfile, apiFetchVideos } from './api';
+import { apiFetchUserProfile, apiFetchVideos, apiCheckAndCatchup } from './api';
 
 const STORAGE_KEYS = {
   CHANNELS: 'neoshort_v1_channels',
@@ -266,6 +266,26 @@ export default function App() {
       console.warn("OAuth redirect param parse error:", e);
     }
   }, []);
+
+  // Offline-to-Online Catchup: When phone internet turns on, check if scheduled upload was missed
+  useEffect(() => {
+    async function triggerOverdueCatchup() {
+      if (!activeChannel?.id) return;
+      try {
+        console.log("[Catch-Up] Checking for overdue scheduled uploads on channel:", activeChannel.title);
+        const res = await apiCheckAndCatchup(activeChannel.id);
+        if (res && res.catchupExecuted && res.video) {
+          handleVideoCreated(res.video);
+        }
+      } catch (err) {
+        console.log("Catchup check idle:", err.message);
+      }
+    }
+
+    triggerOverdueCatchup();
+    window.addEventListener('online', triggerOverdueCatchup);
+    return () => window.removeEventListener('online', triggerOverdueCatchup);
+  }, [activeChannel?.id]);
 
   const handleChannelConnected = (newChannel) => {
     setChannels(prev => {

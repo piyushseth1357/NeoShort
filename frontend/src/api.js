@@ -59,3 +59,17 @@ export async function apiGenerateAndUpload(payload) {
     return null;
   }
 }
+
+export async function apiCheckAndCatchup(channelId) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/pipeline/check-and-catchup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ channelId })
+    });
+    return await res.json();
+  } catch (err) {
+    console.warn("Backend catchup offline:", err);
+    return null;
+  }
+}

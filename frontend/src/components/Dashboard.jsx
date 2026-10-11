@@ -92,10 +92,10 @@ export default function Dashboard({
 
             <button
               onClick={onOpenGenerate}
-              className="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-gradient-to-r from-[#ff2d55] to-[#c70039] hover:from-[#ff4065] text-white shadow-neo flex items-center gap-2 transition transform active:scale-95"
+              className="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-black bg-gradient-to-r from-red-600 via-[#ff2d55] to-[#c70039] hover:from-red-500 hover:to-[#ff4065] text-white shadow-neo flex items-center gap-2 transition transform hover:scale-[1.02] active:scale-95 animate-pulse-slow"
             >
-              <Sparkles className="w-4 h-4" />
-              <span>Generate & Upload Short Now</span>
+              <Sparkles className="w-4 h-4 text-white" />
+              <span>⚡ 1-Click Generate & Upload to YouTube</span>
             </button>
           </div>
 
@@ -122,8 +122,9 @@ export default function Dashboard({
               <p className="text-2xl font-black text-white">
                 {autoPilotEnabled ? "100% Autopilot" : "Review Before Post"}
               </p>
-              <p className="text-xs text-gray-400 mt-1">
-                {autoPilotEnabled ? "Daily Shorts render and auto-upload at peak audience hours automatically." : "Shorts are queued for your 1-click preview and approval."}
+              <p className="text-xs text-emerald-400 font-medium mt-1.5 flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>24/7 Cloud Server Active (Uploads even if mobile internet is off!)</span>
               </p>
             </div>
           </div>

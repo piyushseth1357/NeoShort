@@ -17,9 +17,7 @@ const SCOPES = [
  * Creates an OAuth2 Client instance
  */
 export function createOAuth2Client(redirectUri) {
-  const defaultRedirect = process.env.RENDER_EXTERNAL_URL 
-    ? `${process.env.RENDER_EXTERNAL_URL}/api/youtube/oauth2callback`
-    : 'https://neoshort.onrender.com/api/youtube/oauth2callback';
+  const defaultRedirect = 'https://neoshort.onrender.com/api/youtube/oauth2callback';
 
   return new google.auth.OAuth2(
     CLIENT_ID,
@@ -33,11 +31,14 @@ export function createOAuth2Client(redirectUri) {
  */
 export function getAuthUrl(redirectUri, state = {}) {
   const oauth2Client = createOAuth2Client(redirectUri);
+  // Base64URL encode state to completely eliminate Google 400 malformed query errors
+  const safeState = Buffer.from(JSON.stringify(state)).toString('base64url');
+
   return oauth2Client.generateAuthUrl({
     access_type: 'offline', // Critical for receiving refresh_token to upload 24/7
     scope: SCOPES,
     prompt: 'consent', // Ensures refresh token is granted every time
-    state: JSON.stringify(state)
+    state: safeState
   });
 }
 
