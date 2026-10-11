@@ -339,20 +339,22 @@ app.get('/api/trends/detect', (req, res) => {
 // Autonomous Pipeline: Generate & Upload
 app.post('/api/pipeline/generate-and-upload', async (req, res) => {
   try {
-    const { channelId, niche, topic, uploadNow, voice } = req.body;
+    const { channelId, niche, topic, uploadNow, voice, language } = req.body;
     const db = getDb();
     
     const selectedNiche = niche || "Mind-Blowing Facts & Science";
+    const selectedVoice = voice || (language === 'Hindi' ? "hi-IN-MadhurNeural" : "en-US-ChristopherNeural");
+    const scriptLanguage = language || (selectedVoice.startsWith('hi') ? 'Hindi' : 'English');
     
     // 1. Generate Script via Gemini AI
-    const script = await generateShortScript(selectedNiche, topic);
+    const script = await generateShortScript(selectedNiche, topic, scriptLanguage);
     
     // 2. Synthesize Studio Voiceover via Edge-TTS
     const videoId = "vid_" + Date.now();
     const outputDir = path.join(__dirname, 'output', videoId);
     let voiceResult = null;
     try {
-      voiceResult = await generateVoiceover(script.narration, outputDir, voice || "en-US-ChristopherNeural");
+      voiceResult = await generateVoiceover(script.narration, outputDir, selectedVoice);
     } catch (vErr) {
       console.warn("Voice gen fallback:", vErr.message);
     }
@@ -466,12 +468,14 @@ app.post('/api/pipeline/check-and-catchup', async (req, res) => {
 
     console.log(`[Catch-Up] Device reconnected to internet! Triggering overdue daily Short for ${channel.title}...`);
     
-    const script = await generateShortScript(channel.niche || "Mind-Blowing Facts & Science");
+    const catchupVoice = channel.preferredVoice || "hi-IN-MadhurNeural";
+    const catchupLang = catchupVoice.startsWith('hi') ? 'Hindi' : 'English';
+    const script = await generateShortScript(channel.niche || "Mind-Blowing Facts & Science", null, catchupLang);
     const videoId = "vid_" + Date.now();
     const outputDir = path.join(__dirname, 'output', videoId);
     let voiceResult = null;
     try {
-      voiceResult = await generateVoiceover(script.narration, outputDir, "en-US-ChristopherNeural");
+      voiceResult = await generateVoiceover(script.narration, outputDir, catchupVoice);
     } catch (vErr) {
       console.warn("Catchup voice gen fallback:", vErr.message);
     }
