@@ -137,24 +137,24 @@ export default function App() {
     }
   });
 
-  // Permanent View (If installed as App or channel connected, open App directly!)
+  // View Mode: Installed APK/PWA opens Native App directly; Web browser opens Landing Page with Download section
   const [currentView, setCurrentView] = useState(() => {
     try {
-      const isStandalone = typeof window !== 'undefined' && (
+      const isStandaloneApp = typeof window !== 'undefined' && (
         window.matchMedia('(display-mode: standalone)').matches ||
-        window.navigator.standalone ||
+        window.navigator.standalone === true ||
         document.referrer.includes('android-app://') ||
+        window.location.search.includes('source=apk') ||
         window.location.search.includes('mode=app')
       );
-      if (isStandalone) {
+      if (isStandaloneApp) {
         return 'app';
       }
-      const hasCustom = localStorage.getItem(STORAGE_KEYS.HAS_CUSTOM);
-      const savedView = localStorage.getItem(STORAGE_KEYS.CURRENT_VIEW);
-      if (hasCustom === 'true' || savedView === 'app' || savedView === 'dashboard') {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('view') === 'app' || urlParams.get('channel_connected') === 'true') {
         return 'app';
       }
-      return savedView || 'landing';
+      return 'landing';
     } catch {
       return 'landing';
     }

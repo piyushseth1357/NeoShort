@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Sparkles, Wand2, Mic, Film, CheckCircle2, 
+  Home, Sparkles, Wand2, Mic, Film, CheckCircle2, 
   ExternalLink, Download, Share2, Copy, Check, Play, Pause, 
   RefreshCw, Volume2, Globe, Flame, AlertCircle, Wifi,
   LayoutDashboard, Video, TrendingUp, Settings, Plus,
   Layers, Clock, Heart, Eye, ArrowRight, UserCheck, ShieldCheck,
-  ChevronRight, ToggleLeft, ToggleRight
+  ChevronRight, ToggleLeft, ToggleRight, Smartphone, Zap
 } from 'lucide-react';
 import Youtube from './YoutubeIcon';
 import confetti from 'canvas-confetti';
@@ -36,7 +36,7 @@ export default function StudioApp({
   onOpenConnectChannel,
   onExitApp 
 }) {
-  const [activeTab, setActiveTab] = useState('pipeline'); // 'pipeline' | 'autopilot' | 'vault' | 'trends' | 'settings'
+  const [activeTab, setActiveTab] = useState('home'); // 'home' | 'pipeline' | 'vault' | 'trends' | 'settings'
   const [topic, setTopic] = useState('');
   const [selectedVoice, setSelectedVoice] = useState('hi-IN-MadhurNeural');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -212,17 +212,20 @@ export default function StudioApp({
           
           {/* Logo & Brand */}
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#ff2d55] to-[#c70039] flex items-center justify-center text-white shadow-neo">
+            <div 
+              onClick={() => setActiveTab('home')}
+              className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#ff2d55] to-[#c70039] flex items-center justify-center text-white shadow-neo cursor-pointer"
+            >
               <Sparkles className="w-5 h-5" />
             </div>
-            <div>
+            <div onClick={() => setActiveTab('home')} className="cursor-pointer">
               <div className="flex items-center gap-1.5">
                 <span className="font-black text-base tracking-tight text-white">NeoShort</span>
-                <span className="px-1.5 py-0.2 rounded bg-[#ff2d55]/20 text-[#ff2d55] text-[10px] font-extrabold border border-[#ff2d55]/30">STUDIO</span>
+                <span className="px-1.5 py-0.2 rounded bg-[#ff2d55]/20 text-[#ff2d55] text-[10px] font-extrabold border border-[#ff2d55]/30">APP</span>
               </div>
               <p className="text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                Cloud Engine 24/7 Active
+                Cloud Autopilot 24/7 Active
               </p>
             </div>
           </div>
@@ -253,9 +256,9 @@ export default function StudioApp({
       <nav className="hidden md:flex bg-[#0a0a10] border-b border-white/5 px-4 py-2">
         <div className="max-w-6xl mx-auto flex items-center gap-2 w-full">
           {[
-            { id: 'pipeline', label: '⚡ Pipeline Studio', icon: Sparkles },
-            { id: 'autopilot', label: '📊 Autopilot Hub', icon: LayoutDashboard },
-            { id: 'vault', label: `🎬 Video Vault (${videos.length})`, icon: Video },
+            { id: 'home', label: '🏠 Home', icon: Home },
+            { id: 'pipeline', label: '⚡ Studio Pipeline', icon: Sparkles },
+            { id: 'vault', label: `🎬 My Shorts (${videos.length})`, icon: Video },
             { id: 'trends', label: '🔥 Trend Radar', icon: Flame },
             { id: 'settings', label: '⚙️ Settings', icon: Settings }
           ].map(tab => (
@@ -278,12 +281,171 @@ export default function StudioApp({
       {/* 🌟 MAIN APP PAGES CONTAINER */}
       <main className="max-w-4xl mx-auto w-full px-4 pt-4 sm:pt-6">
 
+        {/* ----------------- PAGE 0: 🏠 APP HOME DASHBOARD ----------------- */}
+        {activeTab === 'home' && (
+          <div className="space-y-5 animate-fadeIn text-left">
+            
+            {/* Welcome & Channel Status Card */}
+            <div className="p-6 rounded-3xl bg-gradient-to-br from-[#161622] via-[#101017] to-[#0d0d14] border border-white/10 shadow-card relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-[#ff2d55]/10 rounded-full blur-[80px] pointer-events-none"></div>
+
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
+                <div className="flex items-center gap-3.5">
+                  <div className="relative">
+                    <img 
+                      src={activeChannel?.avatar || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150"} 
+                      alt="Channel" 
+                      className="w-14 h-14 rounded-2xl object-cover border-2 border-white/20 shadow-neo"
+                    />
+                    <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-[#101017]"></span>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-lg font-black text-white">{activeChannel?.title || 'Fact & Mistery'}</h2>
+                      <span className="px-2 py-0.5 rounded-full bg-white/10 text-gray-300 text-[10px] font-bold border border-white/5">
+                        {activeChannel?.handle || '@MisteryFact-01'}
+                      </span>
+                    </div>
+                    <p className="text-xs text-emerald-400 font-semibold flex items-center gap-1.5 mt-0.5">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                      24/7 Cloud Autopilot Active (Uploads even if phone is off)
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setActiveTab('pipeline')}
+                  className="py-3 px-5 rounded-2xl bg-gradient-to-r from-red-600 via-[#ff2d55] to-[#c70039] hover:from-red-500 hover:to-[#ff4065] text-white text-xs font-black flex items-center justify-center gap-2 shadow-neo transition transform hover:scale-[1.02] active:scale-95"
+                >
+                  <Zap className="w-4 h-4 fill-white" />
+                  <span>1-Click Create Short</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Next Scheduled Auto-Upload & Offline Radar */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              
+              <div className="p-5 rounded-3xl bg-[#11111a] border border-white/10 shadow-card flex flex-col justify-between">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Daily Peak Upload</span>
+                  <Clock className="w-5 h-5 text-amber-400" />
+                </div>
+                <div>
+                  <p className="text-2xl font-black text-amber-400">18:45 IST (Daily)</p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Audience peak window. Next auto-upload in <strong className="text-white">{countdownText || 'today'}</strong>.
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-5 rounded-3xl bg-[#11111a] border border-white/10 shadow-card flex flex-col justify-between">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Offline Catch-Up</span>
+                  <Wifi className="w-5 h-5 text-emerald-400" />
+                </div>
+                <div>
+                  <p className="text-2xl font-black text-emerald-400">Auto-Sync On</p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Internet off at 18:45? Video publishes the second you turn internet back on.
+                  </p>
+                </div>
+              </div>
+
+            </div>
+
+            {/* Quick Action Hub */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {[
+                { label: '⚡ Studio Pipeline', desc: 'Create 9:16 Short', tab: 'pipeline', icon: Sparkles, color: 'text-[#ff2d55]' },
+                { label: '🎬 My Shorts', desc: `${videos.length} Videos ready`, tab: 'vault', icon: Video, color: 'text-blue-400' },
+                { label: '🔥 Trend Radar', desc: 'Viral Topics (98%)', tab: 'trends', icon: Flame, color: 'text-amber-500' },
+                { label: '⚙️ Settings', desc: 'Manage Channels', tab: 'settings', icon: Settings, color: 'text-gray-400' }
+              ].map((item, idx) => (
+                <div
+                  key={idx}
+                  onClick={() => setActiveTab(item.tab)}
+                  className="p-4 rounded-2xl bg-[#11111a] border border-white/10 hover:border-[#ff2d55]/40 cursor-pointer transition shadow-card group"
+                >
+                  <item.icon className={`w-6 h-6 ${item.color} mb-2 group-hover:scale-110 transition`} />
+                  <p className="text-xs font-black text-white">{item.label}</p>
+                  <p className="text-[10px] text-gray-400 mt-0.5">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Today's Video Card (Quick Watch & Post) */}
+            {currentVideo && (
+              <div className="p-5 rounded-3xl bg-[#11111a] border border-white/10 shadow-card text-left space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-white flex items-center gap-2">
+                    <Video className="w-4 h-4 text-[#ff2d55]" />
+                    <span>Today's Video Ready in Vault</span>
+                  </span>
+                  <button onClick={() => setActiveTab('vault')} className="text-[11px] text-[#ff2d55] hover:underline font-bold">
+                    View All ({videos.length}) &rarr;
+                  </button>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-4 items-center pt-1">
+                  <div 
+                    onClick={() => setPlayingVideoModal(currentVideo)}
+                    className="relative w-full max-w-[160px] aspect-[9/16] rounded-2xl overflow-hidden border-2 border-white/20 bg-black shadow-card shrink-0 cursor-pointer group"
+                  >
+                    <img src={currentVideo.thumbnail} alt="Thumbnail" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-full bg-red-600/90 text-white flex items-center justify-center shadow-neo">
+                        <Play className="w-4 h-4 ml-0.5 fill-white" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex-1 space-y-2 text-xs w-full">
+                    <h4 className="text-sm font-black text-white leading-snug">{currentVideo.title}</h4>
+                    <p className="text-gray-300 italic bg-black/40 p-2.5 rounded-xl border border-white/5">
+                      "{currentVideo.scriptHook}"
+                    </p>
+                    <div className="pt-1 grid grid-cols-3 gap-2">
+                      <button
+                        onClick={() => {
+                          setPlayingVideoModal(currentVideo);
+                          setShowUploadGuide(true);
+                        }}
+                        className="py-2 px-2 rounded-xl bg-gradient-to-r from-red-600 to-[#ff2d55] text-white text-xs font-bold flex items-center justify-center gap-1 shadow-neo"
+                      >
+                        <Youtube className="w-3.5 h-3.5" />
+                        <span>Post</span>
+                      </button>
+                      <button
+                        onClick={() => handleDownload(currentVideo)}
+                        className="py-2 px-2 rounded-xl bg-emerald-500/15 text-emerald-300 text-xs font-bold flex items-center justify-center gap-1 border border-emerald-500/30"
+                      >
+                        <Download className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>MP4</span>
+                      </button>
+                      <button
+                        onClick={() => handleCopy(currentVideo)}
+                        className="py-2 px-2 rounded-xl bg-blue-500/15 text-blue-300 text-xs font-bold flex items-center justify-center gap-1 border border-blue-500/30"
+                      >
+                        {copiedId === currentVideo.id ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-blue-400" />}
+                        <span>Copy</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+          </div>
+        )}
+
         {/* ----------------- PAGE 1: ⚡ PIPELINE STUDIO ----------------- */}
         {activeTab === 'pipeline' && (
           <div className="space-y-5 animate-fadeIn">
             
             {/* Top Pipeline Bar */}
-            <div className="p-4 rounded-3xl bg-[#11111a] border border-white/10 shadow-card flex items-center justify-between">
+            <div className="p-4 rounded-3xl bg-[#11111a] border border-white/10 shadow-card flex items-center justify-between text-left">
               <div>
                 <h2 className="text-lg font-black text-white flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-[#ff2d55]" />
@@ -293,10 +455,12 @@ export default function StudioApp({
                   1-Click Hook, Neural Voiceover, FFmpeg Vertical Render & YouTube Publishing
                 </p>
               </div>
-              <span className="hidden sm:inline-flex px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-xs font-bold items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                Autopilot Ready
-              </span>
+              <button
+                onClick={() => setActiveTab('home')}
+                className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-bold text-gray-300 border border-white/10"
+              >
+                🏠 Home
+              </button>
             </div>
 
             {/* Stepper Inputs */}
@@ -568,102 +732,13 @@ export default function StudioApp({
           </div>
         )}
 
-        {/* ----------------- PAGE 2: 📊 AUTOPILOT HUB ----------------- */}
-        {activeTab === 'autopilot' && (
-          <div className="space-y-5 animate-fadeIn text-left">
-            
-            {/* Catch-Up Banner */}
-            <div className="p-4 rounded-3xl bg-gradient-to-r from-emerald-950/40 via-[#101017] to-black border border-emerald-500/25 shadow-card flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0 text-emerald-400">
-                <Wifi className="w-5 h-5" />
-              </div>
-              <div className="text-xs">
-                <p className="font-bold text-white flex items-center gap-2">
-                  <span>📶 Smart Offline-to-Online Catchup Active</span>
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-extrabold">24/7 CLOUD</span>
-                </p>
-                <p className="text-gray-400 mt-0.5 leading-relaxed">
-                  Even if your phone is OFF at 18:45 IST, NeoShort generates and publishes immediately upon reconnection.
-                </p>
-              </div>
-            </div>
-
-            {/* Metric Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              
-              <div className="p-5 rounded-3xl bg-[#11111a] border border-white/10 shadow-card flex flex-col justify-between">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Cloud Engine</span>
-                  <button onClick={() => setAutoPilotEnabled(!autoPilotEnabled)} className="text-[#ff2d55]">
-                    {autoPilotEnabled ? <ToggleRight className="w-7 h-7" /> : <ToggleLeft className="w-7 h-7 text-gray-600" />}
-                  </button>
-                </div>
-                <div>
-                  <p className="text-xl font-black text-white">{autoPilotEnabled ? "100% Autopilot" : "Review First"}</p>
-                  <p className="text-xs text-emerald-400 mt-1 flex items-center gap-1">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span>24/7 Cloud Active</span>
-                  </p>
-                </div>
-              </div>
-
-              <div className="p-5 rounded-3xl bg-[#11111a] border border-white/10 shadow-card flex flex-col justify-between">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Next Auto-Run</span>
-                  <Clock className="w-5 h-5 text-amber-400" />
-                </div>
-                <div>
-                  <p className="text-xl font-black text-amber-400">18:45 IST (Daily)</p>
-                  <p className="text-xs text-gray-400 mt-1">Countdown: <strong className="text-white">{countdownText || 'today'}</strong></p>
-                </div>
-              </div>
-
-              <div className="p-5 rounded-3xl bg-[#11111a] border border-white/10 shadow-card flex flex-col justify-between">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Hook Retention</span>
-                  <TrendingUp className="w-5 h-5 text-emerald-400" />
-                </div>
-                <div>
-                  <p className="text-xl font-black text-emerald-400">94.8% Avg CTR</p>
-                  <p className="text-xs text-gray-400 mt-1">Gemini 1.5 Viral Structure</p>
-                </div>
-              </div>
-
-            </div>
-
-            {/* Niche Control Bar */}
-            <div className="p-5 rounded-3xl bg-[#11111a] border border-white/10 shadow-card">
-              <h3 className="text-white font-bold text-xs uppercase tracking-wider mb-2 flex items-center gap-2">
-                <Layers className="w-4 h-4 text-[#ff2d55]" />
-                <span>Niche Focus</span>
-              </h3>
-              <div className="flex items-center gap-2 overflow-x-auto pb-1">
-                {niches.map((n) => (
-                  <button
-                    key={n}
-                    onClick={() => setSelectedNiche(n)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition ${
-                      selectedNiche === n 
-                        ? 'bg-[#ff2d55] text-white shadow-neo' 
-                        : 'bg-black/40 text-gray-400 hover:text-white border border-white/5'
-                    }`}
-                  >
-                    {n}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-          </div>
-        )}
-
-        {/* ----------------- PAGE 3: 🎬 VIDEO VAULT ----------------- */}
+        {/* ----------------- PAGE 2: 🎬 SHORTS VAULT ----------------- */}
         {activeTab === 'vault' && (
           <div className="space-y-4 animate-fadeIn text-left">
             <div className="flex items-center justify-between mb-2">
               <h2 className="text-base font-black text-white flex items-center gap-2">
                 <Video className="w-5 h-5 text-[#ff2d55]" />
-                <span>Shorts Vault ({videos.length})</span>
+                <span>My Shorts Vault ({videos.length})</span>
               </h2>
               <button
                 onClick={() => setActiveTab('pipeline')}
@@ -724,7 +799,7 @@ export default function StudioApp({
                         onClick={() => handleCopy(vid)}
                         className="py-1.5 px-2 rounded-lg bg-blue-500/15 text-blue-300 text-[10px] font-bold flex items-center justify-center gap-1 hover:bg-blue-500/30 transition"
                       >
-                        {copiedId === vid.id ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3 text-blue-400" />}
+                        {copiedId === vid.id ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-blue-400" />}
                         <span>{copiedId === vid.id ? "Done" : "Copy"}</span>
                       </button>
                     </div>
@@ -735,7 +810,7 @@ export default function StudioApp({
           </div>
         )}
 
-        {/* ----------------- PAGE 4: 🔥 TREND RADAR ----------------- */}
+        {/* ----------------- PAGE 3: 🔥 TREND RADAR ----------------- */}
         {activeTab === 'trends' && (
           <div className="space-y-4 animate-fadeIn text-left">
             <div className="flex items-center justify-between mb-2">
@@ -779,7 +854,7 @@ export default function StudioApp({
           </div>
         )}
 
-        {/* ----------------- PAGE 5: ⚙️ SETTINGS & CHANNEL ----------------- */}
+        {/* ----------------- PAGE 4: ⚙️ SETTINGS & CHANNEL ----------------- */}
         {activeTab === 'settings' && (
           <div className="space-y-5 animate-fadeIn text-left">
             <h2 className="text-base font-black text-white flex items-center gap-2 mb-3">
@@ -829,7 +904,7 @@ export default function StudioApp({
                 {onExitApp && (
                   <>
                     <span>•</span>
-                    <button onClick={onExitApp} className="text-gray-400 hover:text-white">View Landing Page</button>
+                    <button onClick={onExitApp} className="text-gray-400 hover:text-white">View Website Landing Page</button>
                   </>
                 )}
               </div>
@@ -939,8 +1014,8 @@ export default function StudioApp({
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0e0e16]/95 backdrop-blur-2xl border-t border-white/10 px-2 py-2">
         <div className="grid grid-cols-5 gap-1">
           {[
+            { id: 'home', label: 'Home', icon: Home },
             { id: 'pipeline', label: 'Studio', icon: Sparkles },
-            { id: 'autopilot', label: 'Autopilot', icon: LayoutDashboard },
             { id: 'vault', label: 'Shorts', icon: Video },
             { id: 'trends', label: 'Trends', icon: Flame },
             { id: 'settings', label: 'Settings', icon: Settings }
