@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   X, Sparkles, Wand2, Mic, Film, CheckCircle2, ArrowRight, 
   ExternalLink, Download, Share2, Copy, Check, Play, Pause, 
-  RefreshCw, Volume2, Globe, Flame 
+  RefreshCw, Volume2, Globe, Flame, AlertCircle, HelpCircle
 } from 'lucide-react';
 import Youtube from './YoutubeIcon';
 import confetti from 'canvas-confetti';
@@ -31,7 +31,7 @@ export default function GenerateVideoModal({ isOpen, onClose, channel, onVideoCr
   const [stage, setStage] = useState(0);
   const [generatedVideo, setGeneratedVideo] = useState(null);
   const [copied, setCopied] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [showUploadGuide, setShowUploadGuide] = useState(false);
 
   const stages = [
     { title: "Analyzing YouTube Viral Trends", desc: `Scanning trending retention patterns in ${channel?.niche || "Facts"}` },
@@ -48,7 +48,7 @@ export default function GenerateVideoModal({ isOpen, onClose, channel, onVideoCr
       setStage(0);
       setGeneratedVideo(null);
       setCopied(false);
-      setIsPlaying(false);
+      setShowUploadGuide(false);
     }
   }, [isOpen]);
 
@@ -85,7 +85,7 @@ export default function GenerateVideoModal({ isOpen, onClose, channel, onVideoCr
       console.warn("Backend live pipeline fallback:", e);
     }
 
-    // High-quality fallback if backend is offline
+    // High-quality fallback if backend is offline or during testing
     if (!newVid) {
       const chosenTopic = topic.trim() || "The Mariana Trench Sonic Anomaly";
       newVid = {
@@ -94,11 +94,11 @@ export default function GenerateVideoModal({ isOpen, onClose, channel, onVideoCr
         channelId: channel?.id || "UC_misteryfact01",
         channelName: channel?.title || "Fact & Mistery",
         niche: channel?.niche || "Mind-Blowing Facts & Science",
-        status: uploadDirectly ? "Uploaded & Live" : "Ready for Post",
-        views: "1 (Live Test)",
+        status: "Ready to Publish",
+        views: "1 (Live Preview)",
         likes: "0",
         comments: "0",
-        scheduledFor: "Live on YouTube",
+        scheduledFor: "Today, Peak Window",
         uploadedAt: new Date().toISOString(),
         retentionScore: "96% (Ultra-Hook)",
         duration: "0:42",
@@ -131,23 +131,7 @@ export default function GenerateVideoModal({ isOpen, onClose, channel, onVideoCr
 
   const handleShareToYouTube = async () => {
     if (!generatedVideo) return;
-    const shareText = `${generatedVideo.title}\n\n${generatedVideo.narration || ''}\n\n${(generatedVideo.tags || []).join(' ')}`;
-
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: generatedVideo.title,
-          text: shareText,
-          url: generatedVideo.youtubeUrl || generatedVideo.videoUrl
-        });
-        return;
-      } catch (err) {
-        console.log("Share skipped or dismissed:", err);
-      }
-    }
-
-    // Direct fallback to YouTube Upload Studio
-    window.open('https://studio.youtube.com/channel', '_blank');
+    setShowUploadGuide(true);
   };
 
   const handleCopyPackage = () => {
@@ -171,12 +155,12 @@ export default function GenerateVideoModal({ isOpen, onClose, channel, onVideoCr
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
-      <div className="relative w-full max-w-xl rounded-3xl bg-[#12121b] border border-white/10 p-6 sm:p-8 shadow-deep max-h-[92vh] overflow-y-auto">
+      <div className="relative w-full max-w-xl rounded-3xl bg-[#12121b] border border-white/10 p-5 sm:p-7 shadow-deep max-h-[94vh] overflow-y-auto">
         
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-white transition"
+          className="absolute top-5 right-5 w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-white transition z-10"
         >
           <X className="w-4 h-4" />
         </button>
@@ -184,17 +168,17 @@ export default function GenerateVideoModal({ isOpen, onClose, channel, onVideoCr
         {/* ----------------- STATE 1: SETUP & CUSTOMIZATION ----------------- */}
         {modalState === 'setup' && (
           <div>
-            <div className="text-center mb-6">
-              <div className="w-13 h-13 rounded-2xl bg-[#ff2d55]/10 border border-[#ff2d55]/20 flex items-center justify-center mx-auto mb-3 text-[#ff2d55] shadow-neo">
-                <Sparkles className="w-7 h-7" />
+            <div className="text-center mb-5">
+              <div className="w-12 h-12 rounded-2xl bg-[#ff2d55]/10 border border-[#ff2d55]/20 flex items-center justify-center mx-auto mb-2 text-[#ff2d55] shadow-neo">
+                <Sparkles className="w-6 h-6" />
               </div>
-              <h3 className="text-2xl font-black text-white">⚡ 1-Click AI Shorts Studio</h3>
+              <h3 className="text-xl sm:text-2xl font-black text-white">⚡ 1-Click AI Shorts Studio</h3>
               <p className="text-xs text-gray-400 mt-1">
                 Target Channel: <span className="text-white font-bold">{channel?.title || 'Fact & Mistery'}</span> ({channel?.handle || '@MisteryFact-01'})
               </p>
             </div>
 
-            <div className="space-y-5 text-left">
+            <div className="space-y-4 text-left">
               {/* Topic Input & Quick Buttons */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
@@ -214,7 +198,7 @@ export default function GenerateVideoModal({ isOpen, onClose, channel, onVideoCr
                 </div>
                 <input
                   type="text"
-                  placeholder="e.g. Mariana Trench mysterious sound, Brain secrets... (or leave blank for AI Trend)"
+                  placeholder="e.g. Mariana Trench mystery, Brain secrets... (or leave blank for AI Trend)"
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
                   className="w-full px-4 py-3 rounded-2xl bg-black/50 border border-white/10 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#ff2d55] transition"
@@ -240,14 +224,14 @@ export default function GenerateVideoModal({ isOpen, onClose, channel, onVideoCr
                 <label className="block text-xs font-bold text-gray-300 mb-2">
                   🎙️ Studio Voiceover & Language
                 </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {VOICES.map((v) => {
                     const isSelected = selectedVoice === v.id;
                     return (
                       <div
                         key={v.id}
                         onClick={() => setSelectedVoice(v.id)}
-                        className={`p-3 rounded-2xl border cursor-pointer transition text-left flex items-start gap-2.5 ${
+                        className={`p-2.5 rounded-2xl border cursor-pointer transition text-left flex items-start gap-2.5 ${
                           isSelected 
                             ? 'bg-[#ff2d55]/10 border-[#ff2d55] shadow-neo' 
                             : 'bg-black/40 border-white/5 hover:border-white/20'
@@ -269,25 +253,6 @@ export default function GenerateVideoModal({ isOpen, onClose, channel, onVideoCr
                 </div>
               </div>
 
-              {/* Auto Upload Checkbox */}
-              <div 
-                onClick={() => setUploadDirectly(!uploadDirectly)}
-                className="p-3.5 rounded-2xl bg-black/40 border border-white/10 flex items-center justify-between cursor-pointer hover:border-white/20 transition"
-              >
-                <div className="flex items-center gap-2.5">
-                  <Youtube className="w-5 h-5 text-red-500" />
-                  <div>
-                    <p className="text-xs font-bold text-white">Instant Upload Mode</p>
-                    <p className="text-[11px] text-gray-400">Pushes directly to YouTube channel ready for views</p>
-                  </div>
-                </div>
-                <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition ${
-                  uploadDirectly ? 'bg-[#ff2d55] border-[#ff2d55] text-white' : 'border-white/20 bg-transparent'
-                }`}>
-                  {uploadDirectly && <Check className="w-3.5 h-3.5 stroke-[3]" />}
-                </div>
-              </div>
-
               {/* Submit Button */}
               <button
                 type="button"
@@ -295,7 +260,7 @@ export default function GenerateVideoModal({ isOpen, onClose, channel, onVideoCr
                 className="w-full py-4 rounded-2xl font-black text-sm bg-gradient-to-r from-red-600 via-[#ff2d55] to-[#c70039] hover:from-red-500 hover:to-[#ff4065] text-white shadow-neo flex items-center justify-center gap-2 transition transform hover:scale-[1.01] active:scale-95"
               >
                 <Sparkles className="w-4 h-4" />
-                <span>⚡ Generate & Upload Short in 1-Click</span>
+                <span>⚡ Generate & Prepare YouTube Short Now</span>
               </button>
             </div>
           </div>
@@ -322,7 +287,7 @@ export default function GenerateVideoModal({ isOpen, onClose, channel, onVideoCr
                 return (
                   <div 
                     key={idx}
-                    className={`p-3.5 rounded-2xl border transition-all duration-300 flex items-center gap-3.5 ${
+                    className={`p-3 rounded-2xl border transition-all duration-300 flex items-center gap-3.5 ${
                       isCurrent 
                         ? 'bg-[#ff2d55]/10 border-[#ff2d55]/60 shadow-neo' 
                         : isDone 
@@ -366,90 +331,66 @@ export default function GenerateVideoModal({ isOpen, onClose, channel, onVideoCr
           </div>
         )}
 
-        {/* ----------------- STATE 3: COMPLETED & POST-CREATION TOOLS ----------------- */}
+        {/* ----------------- STATE 3: COMPLETED & REAL VIDEO PLAYER ----------------- */}
         {modalState === 'completed' && generatedVideo && (
           <div>
-            <div className="text-center mb-5">
-              <div className="w-13 h-13 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto mb-2.5 text-emerald-400 shadow-neo">
-                <CheckCircle2 className="w-7 h-7" />
+            <div className="text-center mb-4">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto mb-2 text-emerald-400 shadow-neo">
+                <CheckCircle2 className="w-6 h-6" />
               </div>
-              <h3 className="text-2xl font-black text-white">🎉 Short Ready & Processed!</h3>
-              <p className="text-xs text-gray-400 mt-1">
-                Channel: <span className="text-white font-bold">{channel?.title || 'Fact & Mistery'}</span> ({channel?.handle || '@MisteryFact-01'})
+              <h3 className="text-xl font-black text-white">🎉 Video Generated & Ready to Watch!</h3>
+              <p className="text-xs text-gray-400 mt-0.5">
+                Target Channel: <span className="text-white font-bold">{channel?.title || 'Fact & Mistery'}</span> ({channel?.handle || '@MisteryFact-01'})
               </p>
             </div>
 
-            {/* Video Preview Card */}
-            <div className="p-4 rounded-2xl bg-black/60 border border-white/10 mb-5 text-left space-y-3">
-              <div className="flex gap-3">
-                <div className="relative w-24 h-36 rounded-xl overflow-hidden border border-white/10 shrink-0 bg-black group">
-                  <img 
-                    src={generatedVideo.thumbnail} 
-                    alt="Thumbnail" 
-                    className="w-full h-full object-cover" 
-                  />
-                  <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                    <span className="px-2 py-0.5 rounded bg-black/70 text-[9px] font-bold text-white">9:16 HD</span>
-                  </div>
-                </div>
-
-                <div className="flex-1 text-xs space-y-1.5 min-w-0">
-                  <p className="text-white font-bold line-clamp-2 leading-snug">
-                    {generatedVideo.title}
-                  </p>
-                  <p className="text-[#ff2d55] text-[11px] font-semibold line-clamp-2">
-                    Hook: "{generatedVideo.scriptHook}"
-                  </p>
-                  
-                  <div className="pt-1.5 flex items-center justify-between text-[11px]">
-                    <span className="text-gray-400">Retention Score:</span>
-                    <span className="text-emerald-400 font-bold">{generatedVideo.retentionScore || '96%'}</span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between text-[11px]">
-                    <span className="text-gray-400">Status:</span>
-                    <span className="text-emerald-400 font-bold flex items-center gap-1">
-                      <CheckCircle2 className="w-3 h-3" />
-                      {generatedVideo.youtubeUrl ? "Live on YouTube" : "Ready to Publish"}
-                    </span>
-                  </div>
-
-                  <div className="flex flex-wrap gap-1 pt-1">
-                    {(generatedVideo.tags || []).slice(0, 3).map(t => (
-                      <span key={t} className="text-[10px] text-gray-400 bg-white/5 px-1.5 py-0.5 rounded">
-                        {t}
-                      </span>
-                    ))}
-                  </div>
+            {/* REAL PLAYABLE 9:16 VERTICAL VIDEO PLAYER */}
+            <div className="mb-4">
+              <div className="relative w-full max-w-[250px] mx-auto aspect-[9/16] rounded-2xl overflow-hidden border-2 border-white/20 bg-black shadow-card group">
+                <video 
+                  src={generatedVideo.videoUrl} 
+                  poster={generatedVideo.thumbnail}
+                  controls 
+                  autoPlay
+                  playsInline 
+                  className="w-full h-full object-cover"
+                >
+                  Your browser does not support the video tag.
+                </video>
+                <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/80 backdrop-blur-md text-[10px] font-bold text-white border border-white/10 pointer-events-none">
+                  9:16 HD Short
                 </div>
               </div>
-
-              {/* Direct YouTube Link if live */}
-              {generatedVideo.youtubeUrl && (
-                <a 
-                  href={generatedVideo.youtubeUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="w-full py-2.5 px-4 rounded-xl font-bold text-xs bg-red-600 hover:bg-red-500 text-white flex items-center justify-center gap-2 shadow-neo transition"
-                >
-                  <Youtube className="w-4 h-4" />
-                  <span>Open Live Short on YouTube</span>
-                  <ExternalLink className="w-3.5 h-3.5 opacity-80" />
-                </a>
-              )}
+              <p className="text-[11px] text-center text-gray-400 mt-1.5 flex items-center justify-center gap-1">
+                <Play className="w-3 h-3 text-[#ff2d55]" /> Click Play above to watch the Short & listen to the AI voiceover!
+              </p>
             </div>
 
-            {/* Quick Action Buttons Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mb-5">
+            {/* Video Details Card */}
+            <div className="p-3.5 rounded-2xl bg-black/60 border border-white/10 mb-4 text-left space-y-2">
+              <p className="text-white text-xs font-bold leading-snug">
+                {generatedVideo.title}
+              </p>
+              <p className="text-[#ff2d55] text-[11px] font-semibold">
+                Hook: "{generatedVideo.scriptHook}"
+              </p>
+              <div className="pt-1 flex items-center justify-between text-[11px] border-t border-white/5">
+                <span className="text-gray-400">Viral Retention Score:</span>
+                <span className="text-emerald-400 font-bold">{generatedVideo.retentionScore || '96%'}</span>
+              </div>
+            </div>
+
+            {/* Action Buttons Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4">
               
-              {/* 1. Share / Post to YouTube App */}
+              {/* 1. Post via YouTube Guide */}
               <button
                 type="button"
                 onClick={handleShareToYouTube}
-                className="py-3 px-3 rounded-xl bg-red-600/15 hover:bg-red-600/25 border border-red-500/30 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition"
+                className="py-3 px-3 rounded-xl bg-gradient-to-r from-red-600 to-[#ff2d55] hover:opacity-90 text-white text-xs font-black flex items-center justify-center gap-1.5 shadow-neo transition"
               >
-                <Youtube className="w-4 h-4 text-red-500" />
-                <span>Post via YouTube</span>
+                <Youtube className="w-4 h-4 text-white" />
+                <span>Post to YouTube</span>
               </button>
 
               {/* 2. Download MP4 to Gallery */}
@@ -473,15 +414,59 @@ export default function GenerateVideoModal({ isOpen, onClose, channel, onVideoCr
               </button>
             </div>
 
-            {/* Close & Reset CTA */}
-            <div className="flex items-center gap-3">
+            {/* Upload Assistant Drawer / Modal */}
+            {showUploadGuide && (
+              <div className="p-4 rounded-2xl bg-red-950/30 border border-red-500/40 text-left space-y-3 mb-4 animate-fadeIn">
+                <div className="flex items-center gap-2 text-white font-bold text-xs">
+                  <AlertCircle className="w-4 h-4 text-[#ff2d55]" />
+                  <span>YouTube Channel Account Notice</span>
+                </div>
+                
+                <p className="text-[11px] text-gray-300 leading-relaxed">
+                  Aapke YouTube App mein wahi email/channel open hona chahiye jisme aap upload karna chahte hain (<strong className="text-white">{channel?.title || 'Fact & Mistery'}</strong>).
+                  Agar YouTube App mein koi doosra channel khula hua hai, toh:
+                </p>
+
+                <div className="space-y-1.5 text-[11px] text-gray-300 bg-black/40 p-2.5 rounded-xl border border-white/5">
+                  <p>1️⃣ <strong>YouTube App</strong> kholein aur top-right mein profile icon par tap karein.</p>
+                  <p>2️⃣ Apna channel <strong className="text-white">"{channel?.title || 'Fact & Mistery'}"</strong> select / switch karein.</p>
+                  <p>3️⃣ <strong>"+"</strong> button par tap karke <strong>"Create a Short"</strong> karein aur downloaded video choose karein!</p>
+                </div>
+
+                <div className="flex items-center gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleCopyPackage();
+                      handleDownloadVideo();
+                      window.open('https://studio.youtube.com', '_blank');
+                    }}
+                    className="flex-1 py-2.5 px-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-neo transition"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    <span>Download Video & Open YouTube</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowUploadGuide(false)}
+                    className="py-2.5 px-3 rounded-xl bg-white/10 text-gray-300 text-xs font-bold hover:bg-white/15"
+                  >
+                    Got It
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Bottom Actions */}
+            <div className="flex items-center gap-2 pt-1">
               <button
                 type="button"
                 onClick={() => {
                   setModalState('setup');
                   setTopic('');
+                  setShowUploadGuide(false);
                 }}
-                className="flex-1 py-3.5 rounded-xl font-bold text-xs bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10 transition flex items-center justify-center gap-1.5"
+                className="flex-1 py-3 rounded-xl font-bold text-xs bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10 transition flex items-center justify-center gap-1.5"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
                 <span>Create Another Short</span>
@@ -490,9 +475,9 @@ export default function GenerateVideoModal({ isOpen, onClose, channel, onVideoCr
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 py-3.5 rounded-xl font-bold text-xs bg-gradient-to-r from-[#ff2d55] to-[#c70039] hover:from-[#ff4065] text-white shadow-neo transition"
+                className="flex-1 py-3 rounded-xl font-bold text-xs bg-white/10 hover:bg-white/20 text-white transition"
               >
-                Done — View in Dashboard
+                Done — Close Window
               </button>
             </div>
           </div>

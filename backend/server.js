@@ -398,7 +398,11 @@ app.post('/api/pipeline/generate-and-upload', async (req, res) => {
       }
     }
 
-    const liveUrl = youtubeUploadResult?.youtubeUrl || "https://assets.mixkit.co/videos/preview/mixkit-aerial-view-of-city-traffic-at-night-42442-large.mp4";
+    const backendHost = req.get('host') || 'neoshort.onrender.com';
+    const isHttps = req.protocol === 'https' || req.get('x-forwarded-proto') === 'https';
+    const serverBaseUrl = `${isHttps ? 'https' : 'http'}://${backendHost}`;
+    const localVideoUrl = renderedVideoPath ? `${serverBaseUrl}/output/${videoId}/short.mp4` : null;
+    const liveUrl = youtubeUploadResult?.youtubeUrl || localVideoUrl || "https://assets.mixkit.co/videos/preview/mixkit-aerial-view-of-city-traffic-at-night-42442-large.mp4";
 
     const newVideo = {
       id: videoId,
@@ -416,12 +420,13 @@ app.post('/api/pipeline/generate-and-upload', async (req, res) => {
       duration: "0:42",
       thumbnail: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80",
       videoUrl: liveUrl,
+      localVideoUrl: localVideoUrl,
       youtubeUrl: youtubeUploadResult?.youtubeUrl || null,
       youtubeId: youtubeUploadResult?.videoId || null,
       scriptHook: script.hook,
       narration: script.narration,
-      voiceFile: voiceResult ? `/output/${videoId}/audio.mp3` : null,
-      videoFile: renderedVideoPath ? `/output/${videoId}/short.mp4` : null,
+      voiceFile: voiceResult ? `${serverBaseUrl}/output/${videoId}/audio.mp3` : null,
+      videoFile: localVideoUrl,
       tags: script.tags || ["#shorts", "#viral", "#facts", "#trending"]
     };
 

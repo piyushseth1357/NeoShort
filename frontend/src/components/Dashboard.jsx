@@ -3,7 +3,7 @@ import {
   Plus, Sparkles, TrendingUp, Clock, CheckCircle2, 
   Settings, Play, Eye, Heart, MessageCircle, RefreshCw, 
   Layers, ArrowUpRight, Flame, ChevronRight, ToggleLeft, ToggleRight, 
-  Radio, Download, Share2, Copy, Check, ExternalLink, Wifi
+  Radio, Download, Share2, Copy, Check, ExternalLink, Wifi, X, AlertCircle
 } from 'lucide-react';
 import Youtube from './YoutubeIcon';
 
@@ -21,6 +21,8 @@ export default function Dashboard({
   const [activeTab, setActiveTab] = useState('videos'); // 'videos' | 'trends'
   const [copiedId, setCopiedId] = useState(null);
   const [countdownText, setCountdownText] = useState('');
+  const [playingVideo, setPlayingVideo] = useState(null);
+  const [showUploadGuide, setShowUploadGuide] = useState(false);
 
   // Live Countdown to 18:45 IST Peak Auto-Upload Window
   useEffect(() => {
@@ -86,21 +88,9 @@ export default function Dashboard({
     setTimeout(() => setCopiedId(null), 2500);
   };
 
-  const handleShareVideo = async (vid) => {
-    const shareText = `${vid.title}\n\n${vid.narration || vid.scriptHook || ''}\n\n${(vid.tags || []).join(' ')}`;
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: vid.title,
-          text: shareText,
-          url: vid.youtubeUrl || vid.videoUrl
-        });
-        return;
-      } catch (err) {
-        // dismissed
-      }
-    }
-    window.open(vid.youtubeUrl || 'https://studio.youtube.com', '_blank');
+  const handleShareVideo = (vid) => {
+    setPlayingVideo(vid);
+    setShowUploadGuide(true);
   };
 
   const handleDownloadVideo = (vid) => {
@@ -310,8 +300,11 @@ export default function Dashboard({
                 className="rounded-3xl bg-[#12121b] border border-white/10 overflow-hidden shadow-card hover:border-white/20 transition flex flex-col justify-between group"
               >
                 <div>
-                  {/* Thumbnail Banner */}
-                  <div className="relative aspect-[16/9] w-full bg-black overflow-hidden">
+                  {/* Thumbnail Banner with Click-to-Play */}
+                  <div 
+                    onClick={() => setPlayingVideo(vid)}
+                    className="relative aspect-[16/9] w-full bg-black overflow-hidden cursor-pointer group"
+                  >
                     <img 
                       src={vid.thumbnail} 
                       alt={vid.title} 
@@ -319,6 +312,13 @@ export default function Dashboard({
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/30"></div>
                     
+                    {/* Play Overlay */}
+                    <div className="absolute inset-0 flex items-center justify-center opacity-90 group-hover:opacity-100 transition">
+                      <div className="w-12 h-12 rounded-full bg-red-600/90 text-white flex items-center justify-center shadow-neo transform group-hover:scale-110 transition">
+                        <Play className="w-5 h-5 ml-0.5 fill-white" />
+                      </div>
+                    </div>
+
                     <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded-md bg-black/70 backdrop-blur-md text-[10px] font-bold text-white border border-white/10">
                       {vid.duration || '0:42'} Shorts
                     </span>
@@ -334,7 +334,10 @@ export default function Dashboard({
 
                   {/* Details */}
                   <div className="p-5">
-                    <h4 className="text-white text-sm font-bold line-clamp-2 leading-snug mb-2">
+                    <h4 
+                      onClick={() => setPlayingVideo(vid)}
+                      className="text-white text-sm font-bold line-clamp-2 leading-snug mb-2 cursor-pointer hover:text-[#ff2d55] transition"
+                    >
                       {vid.title}
                     </h4>
                     
@@ -434,6 +437,120 @@ export default function Dashboard({
         )}
 
       </div>
+
+      {/* 🎬 DEDICATED 9:16 VERTICAL VIDEO PLAYER MODAL */}
+      {playingVideo && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/90 backdrop-blur-md animate-fadeIn">
+          <div className="relative w-full max-w-lg rounded-3xl bg-[#12121b] border border-white/10 p-5 sm:p-7 shadow-deep max-h-[94vh] overflow-y-auto">
+            
+            <button
+              onClick={() => {
+                setPlayingVideo(null);
+                setShowUploadGuide(false);
+              }}
+              className="absolute top-5 right-5 w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-white transition z-10"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="text-center mb-4">
+              <h3 className="text-base sm:text-lg font-black text-white line-clamp-1">{playingVideo.title}</h3>
+              <p className="text-xs text-gray-400 mt-0.5">
+                Channel: <span className="text-white font-bold">{activeChannel?.title || 'Fact & Mistery'}</span>
+              </p>
+            </div>
+
+            {/* 9:16 Vertical Video Player */}
+            <div className="relative w-full max-w-[250px] mx-auto aspect-[9/16] rounded-2xl overflow-hidden border-2 border-white/20 bg-black shadow-card mb-4">
+              <video 
+                src={playingVideo.videoUrl} 
+                poster={playingVideo.thumbnail}
+                controls 
+                autoPlay 
+                playsInline 
+                className="w-full h-full object-cover"
+              >
+                Your browser does not support the video tag.
+              </video>
+            </div>
+
+            <p className="text-xs text-gray-300 italic text-center mb-4 px-4 bg-black/30 py-2 rounded-xl border border-white/5">
+              "{playingVideo.scriptHook}"
+            </p>
+
+            {/* Action Bar */}
+            <div className="grid grid-cols-3 gap-2 mb-4">
+              <button
+                onClick={() => setShowUploadGuide(true)}
+                className="py-2.5 px-2 rounded-xl bg-gradient-to-r from-red-600 to-[#ff2d55] text-white text-xs font-black flex items-center justify-center gap-1 shadow-neo transition"
+              >
+                <Youtube className="w-4 h-4" />
+                <span>Post Short</span>
+              </button>
+
+              <button
+                onClick={() => handleDownloadVideo(playingVideo)}
+                className="py-2.5 px-2 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 text-xs font-bold flex items-center justify-center gap-1 transition"
+              >
+                <Download className="w-4 h-4 text-emerald-400" />
+                <span>Download</span>
+              </button>
+
+              <button
+                onClick={() => handleCopyVideo(playingVideo)}
+                className="py-2.5 px-2 rounded-xl bg-blue-500/15 hover:bg-blue-500/25 border border-blue-500/30 text-blue-300 text-xs font-bold flex items-center justify-center gap-1 transition"
+              >
+                {copiedId === playingVideo.id ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4 text-blue-400" />}
+                <span>{copiedId === playingVideo.id ? "Copied" : "Copy Tags"}</span>
+              </button>
+            </div>
+
+            {/* Account Switcher Warning if user clicked Post Short */}
+            {showUploadGuide && (
+              <div className="p-4 rounded-2xl bg-red-950/30 border border-red-500/40 text-left space-y-2.5 mb-4 animate-fadeIn">
+                <div className="flex items-center gap-2 text-white font-bold text-xs">
+                  <AlertCircle className="w-4 h-4 text-[#ff2d55]" />
+                  <span>Important: YouTube Channel Check</span>
+                </div>
+                
+                <p className="text-[11px] text-gray-300 leading-relaxed">
+                  Aapne mention kiya tha ki YouTube App mein doosra email open hai. Please YouTube App mein <strong className="text-white">"{activeChannel?.title || 'Fact & Mistery'}"</strong> channel par switch karein taaki video sahi channel par upload ho:
+                </p>
+
+                <div className="space-y-1 text-[11px] text-gray-300 bg-black/40 p-2.5 rounded-xl border border-white/5">
+                  <p>1. <strong>YouTube App</strong> mein top-right profile icon dabakar <strong>"{activeChannel?.title || 'Fact & Mistery'}"</strong> select karein.</p>
+                  <p>2. Video gallery mein download ho chuki hai, use <strong>Create Short</strong> se select karein aur title paste kar dein!</p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleCopyVideo(playingVideo);
+                    handleDownloadVideo(playingVideo);
+                    window.open('https://studio.youtube.com', '_blank');
+                  }}
+                  className="w-full py-2.5 px-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-neo transition"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>Download MP4 & Open YouTube Studio</span>
+                </button>
+              </div>
+            )}
+
+            <button
+              onClick={() => {
+                setPlayingVideo(null);
+                setShowUploadGuide(false);
+              }}
+              className="w-full py-3 rounded-xl bg-white/10 text-gray-300 text-xs font-bold hover:bg-white/15 transition"
+            >
+              Close Video Player
+            </button>
+
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
