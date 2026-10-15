@@ -6,6 +6,7 @@ import Features from './components/Features';
 import HowItWorks from './components/HowItWorks';
 import DownloadSection from './components/DownloadSection';
 import Dashboard from './components/Dashboard';
+import StudioApp from './components/StudioApp';
 import AuthModal from './components/AuthModal';
 import ConnectChannelModal from './components/ConnectChannelModal';
 import GenerateVideoModal from './components/GenerateVideoModal';
@@ -136,13 +137,22 @@ export default function App() {
     }
   });
 
-  // Permanent View (If user already connected a channel, open Dashboard directly!)
+  // Permanent View (If installed as App or channel connected, open App directly!)
   const [currentView, setCurrentView] = useState(() => {
     try {
+      const isStandalone = typeof window !== 'undefined' && (
+        window.matchMedia('(display-mode: standalone)').matches ||
+        window.navigator.standalone ||
+        document.referrer.includes('android-app://') ||
+        window.location.search.includes('mode=app')
+      );
+      if (isStandalone) {
+        return 'app';
+      }
       const hasCustom = localStorage.getItem(STORAGE_KEYS.HAS_CUSTOM);
       const savedView = localStorage.getItem(STORAGE_KEYS.CURRENT_VIEW);
-      if (hasCustom === 'true') {
-        return 'dashboard';
+      if (hasCustom === 'true' || savedView === 'app' || savedView === 'dashboard') {
+        return 'app';
       }
       return savedView || 'landing';
     } catch {
@@ -312,84 +322,88 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#08080c] text-white flex flex-col font-sans selection:bg-[#ff2d55]/30 selection:text-white">
-      
-      {/* Top Navbar */}
-      <Navbar 
-        onOpenAuth={() => setIsAuthOpen(true)}
-        onOpenDashboard={() => {
-          setCurrentView('dashboard');
-          localStorage.setItem(STORAGE_KEYS.CURRENT_VIEW, 'dashboard');
-        }}
-        isLoggedIn={true}
-        currentView={currentView}
-        setCurrentView={(view) => {
-          setCurrentView(view);
-          localStorage.setItem(STORAGE_KEYS.CURRENT_VIEW, view);
-        }}
-      />
+      {currentView === 'landing' ? (
+        <>
+          {/* Top Navbar for Landing Page */}
+          <Navbar 
+            onOpenAuth={() => setIsAuthOpen(true)}
+            onOpenDashboard={() => {
+              setCurrentView('app');
+              localStorage.setItem(STORAGE_KEYS.CURRENT_VIEW, 'app');
+            }}
+            isLoggedIn={true}
+            currentView={currentView}
+            setCurrentView={(view) => {
+              setCurrentView(view);
+              localStorage.setItem(STORAGE_KEYS.CURRENT_VIEW, view);
+            }}
+          />
 
-      {/* Main View Switcher */}
-      <main className="flex-1">
-        {currentView === 'landing' ? (
-          <>
+          {/* Landing Page Content */}
+          <main className="flex-1">
             <Hero 
               onOpenDashboard={() => {
-                setCurrentView('dashboard');
-                localStorage.setItem(STORAGE_KEYS.CURRENT_VIEW, 'dashboard');
+                setCurrentView('app');
+                localStorage.setItem(STORAGE_KEYS.CURRENT_VIEW, 'app');
               }} 
               onOpenAuth={() => setIsAuthOpen(true)} 
             />
             <ShortsPreview />
             <Features />
             <HowItWorks onLaunch={() => {
-              setCurrentView('dashboard');
-              localStorage.setItem(STORAGE_KEYS.CURRENT_VIEW, 'dashboard');
+              setCurrentView('app');
+              localStorage.setItem(STORAGE_KEYS.CURRENT_VIEW, 'app');
             }} />
             <DownloadSection />
-          </>
-        ) : (
-          <Dashboard 
-            user={user}
-            channels={channels}
-            activeChannel={activeChannel}
-            setActiveChannel={(ch) => {
-              setActiveChannel(ch);
-              localStorage.setItem(STORAGE_KEYS.ACTIVE_CHANNEL, JSON.stringify(ch));
-            }}
-            videos={videos}
-            onOpenConnectChannel={() => setIsConnectOpen(true)}
-            onOpenGenerate={() => setIsGenerateOpen(true)}
-          />
-        )}
-      </main>
+          </main>
 
-      {/* Modern Minimal Dark Footer */}
-      <footer className="bg-[#050508] border-t border-white/5 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="NeoShort Logo" className="w-8 h-8 rounded-lg object-cover" />
-            <div>
-              <span className="text-white font-black tracking-tight text-lg">Neo<span className="text-[#ff2d55]">Short</span></span>
-              <p className="text-[11px] text-gray-500">Autonomous YouTube Shorts Growth Engine</p>
+          {/* Minimal Dark Footer for Website */}
+          <footer className="bg-[#050508] border-t border-white/5 py-12 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="flex items-center gap-3">
+                <img src="/logo.png" alt="NeoShort Logo" className="w-8 h-8 rounded-lg object-cover" />
+                <div>
+                  <span className="text-white font-black tracking-tight text-lg">Neo<span className="text-[#ff2d55]">Short</span></span>
+                  <p className="text-[11px] text-gray-500">Autonomous YouTube Shorts Growth Engine</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-6 text-xs text-gray-400">
+                <a href="#features" className="hover:text-white transition">Features</a>
+                <a href="#how-it-works" className="hover:text-white transition">How it Works</a>
+                <a href="#downloads" className="hover:text-white transition">Downloads</a>
+                <button onClick={() => {
+                  setCurrentView('app');
+                  localStorage.setItem(STORAGE_KEYS.CURRENT_VIEW, 'app');
+                }} className="hover:text-[#ff2d55] transition font-semibold">Open Studio App</button>
+              </div>
+
+              <div className="text-xs text-gray-500 text-center md:text-right">
+                <p>© 2026 NeoShort AI. Designed & Built by Piyush Seth.</p>
+                <p className="text-[10px] text-gray-600 mt-0.5">Complies with YouTube Data API v3 Terms of Service.</p>
+              </div>
             </div>
-          </div>
-
-          <div className="flex items-center gap-6 text-xs text-gray-400">
-            <a href="#features" onClick={() => setCurrentView('landing')} className="hover:text-white transition">Features</a>
-            <a href="#how-it-works" onClick={() => setCurrentView('landing')} className="hover:text-white transition">How it Works</a>
-            <a href="#downloads" onClick={() => setCurrentView('landing')} className="hover:text-white transition">Downloads</a>
-            <button onClick={() => {
-              setCurrentView('dashboard');
-              localStorage.setItem(STORAGE_KEYS.CURRENT_VIEW, 'dashboard');
-            }} className="hover:text-[#ff2d55] transition font-semibold">Web Dashboard</button>
-          </div>
-
-          <div className="text-xs text-gray-500 text-center md:text-right">
-            <p>© 2026 NeoShort AI. Built for automated YouTube channel scalability.</p>
-            <p className="text-[10px] text-gray-600 mt-0.5">Complies with YouTube Data API v3 Terms of Service.</p>
-          </div>
-        </div>
-      </footer>
+          </footer>
+        </>
+      ) : (
+        /* Dedicated Multi-Page Studio Mobile/Desktop Application */
+        <StudioApp
+          user={user}
+          channels={channels}
+          activeChannel={activeChannel}
+          setActiveChannel={(ch) => {
+            setActiveChannel(ch);
+            localStorage.setItem(STORAGE_KEYS.ACTIVE_CHANNEL, JSON.stringify(ch));
+          }}
+          videos={videos}
+          onVideoCreated={handleVideoCreated}
+          onOpenConnectChannel={() => setIsConnectOpen(true)}
+          onExitApp={() => {
+            setCurrentView('landing');
+            localStorage.setItem(STORAGE_KEYS.CURRENT_VIEW, 'landing');
+          }}
+        />
+      )}
 
       {/* Modals */}
       <AuthModal 
