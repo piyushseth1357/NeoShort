@@ -160,11 +160,12 @@ export default function App() {
         return 'app';
       }
 
-      // Check standalone PWA / TWA environment
+      // Check standalone PWA / TWA / Android WebView / Installed APK environment
       const isStandaloneApp = typeof window !== 'undefined' && (
         window.matchMedia('(display-mode: standalone)').matches ||
         window.navigator.standalone === true ||
-        document.referrer.includes('android-app://')
+        document.referrer.includes('android-app://') ||
+        /(wv|WebView|AppsGeyser)/i.test(navigator.userAgent || '')
       );
       if (isStandaloneApp) {
         localStorage.setItem('neoshort_preferred_view', 'app');
