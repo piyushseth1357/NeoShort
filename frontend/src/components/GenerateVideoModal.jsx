@@ -16,12 +16,253 @@ const VOICES = [
 ];
 
 const QUICK_TOPICS = [
-  "Mariana Trench Sonic Anomaly",
-  "Why Your Brain Deletes Dreams",
-  "Humanoid Robots Crossing The Limit",
-  "Why Time Slows Down on Everest",
-  "The Star That Outlived Its Galaxy"
+  "Black Hole Sound in Deep Space",
+  "Why You Wake Up at 3:15 AM",
+  "The $500M Bitcoin Landfill Mistake",
+  "Mariana Trench 30,000ft Secret",
+  "Why Time Slows on Mount Everest",
+  "When AI Created Its Own Secret Language",
+  "18-Story Ancient Underground City",
+  "Reality Changes When Watched (Quantum)",
+  "The Blood Falls of Antarctica",
+  "The Star Older Than The Universe",
+  "Phantom Phone Vibration Syndrome",
+  "Humanoid Robots Operating Solo"
 ];
+
+const THUMBNAILS = [
+  "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=800&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1507413245164-6160d8298b31?w=800&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1507668077129-56e32842fceb?w=800&auto=format&fit=crop&q=80"
+];
+
+const VIRAL_STORIES_DB = [
+  {
+    topic: "Black Hole Sound in Deep Space",
+    thumbnail: THUMBNAILS[0],
+    en: {
+      title: "NASA Recorded Sound in Deep Space 🌌😱 #shorts #space",
+      hook: "Space is completely silent, right? NASA proved that's a lie...",
+      narration: "NASA sent acoustic sensors towards the Perseus galaxy cluster 250 million light-years away. They recorded an ominous cosmic soundwave vibrating 57 octaves below middle C from a supermassive black hole. Subscribe for daily cosmic secrets!",
+      tags: ["#shorts", "#space", "#blackhole", "#nasa", "#mystery"]
+    },
+    hi: {
+      title: "अंतरिक्ष में रिकॉर्ड हुई ब्लैक होल की भयानक आवाज़ 🌌😱 #shorts",
+      hook: "क्या अंतरिक्ष सच में बिल्कुल शांत है? नासा ने गलत साबित कर दिया...",
+      narration: "वैज्ञानिकों ने ब्लैक होल से निकलने वाली रहस्यमयी ध्वनि तरंगों को रिकॉर्ड किया है। यह आवाज़ ब्रह्मांड की सबसे गहरी और डरावनी ध्वनि है जो अंतरिक्ष को हिला देती है। ऐसे ही रोंगटे खड़े कर देने वाले रहस्यों के लिए सब्सक्राइब करें!",
+      tags: ["#shorts", "#facts", "#space", "#blackhole", "#vigyan"]
+    }
+  },
+  {
+    topic: "Mariana Trench 30,000ft Secret",
+    thumbnail: THUMBNAILS[1],
+    en: {
+      title: "Secret 30,000 Feet Under The Pacific Ocean 🌊😱 #shorts",
+      hook: "Scientists found something 30,000 feet deep in the Mariana Trench...",
+      narration: "Deep in the Mariana Trench, researchers recorded an acoustic pulse repeating every 40 seconds. It is 50 times louder than any whale and travels across whole ocean basins. What is down there? Subscribe for more deep sea secrets!",
+      tags: ["#shorts", "#ocean", "#marianatrench", "#deepsea", "#mystery"]
+    },
+    hi: {
+      title: "मारियाना ट्रेंच में 30,000 फीट नीचे मिला ये रहस्य 🌊😱 #shorts",
+      hook: "प्रशांत महासागर की सबसे गहरी खाई में वैज्ञानिकों को कुछ ऐसा मिला...",
+      narration: "वैज्ञानिकों ने जब मारियाना ट्रेंच में 30,000 फीट नीचे अपना सबमर्सिबल भेजा, तो वहां हर 40 सेकंड में एक अनजान मेटैलिक सिग्नल रिकॉर्ड हुआ जो किसी व्हेल या भूकंप का नहीं था। वैज्ञानिक आज भी हैरान हैं! चैनल को सब्सक्राइब करें!",
+      tags: ["#shorts", "#facts", "#ocean", "#samundar", "#mystery"]
+    }
+  },
+  {
+    topic: "Why You Wake Up at 3:15 AM",
+    thumbnail: THUMBNAILS[2],
+    en: {
+      title: "Why You Always Wake Up at 3 AM Every Night 👁️🧠 #shorts",
+      hook: "If you wake up around 3 AM feeling watched, you're not crazy...",
+      narration: "Waking up between 3 and 4 AM is an evolutionary survival mechanism called the witching cortisol spike. Between sleep cycles, your primal brain releases a sudden burst of adrenaline to scan for predators. Subscribe for more dark psychology facts!",
+      tags: ["#shorts", "#psychology", "#brain", "#sleep", "#facts"]
+    },
+    hi: {
+      title: "रात 3 बजे अचानक नींद क्यों खुल जाती है? 👁️🧠 #shorts",
+      hook: "अगर आपकी नींद भी रात 3 बजे अचानक टूट जाती है, तो ये जान लें...",
+      narration: "रिसर्च के अनुसार, रात 3 से 4 बजे के बीच हमारे दिमाग में एड्रेनालाईन का अचानक स्पाइक होता है। शिकारी जानवरों से बचने के लिए इंसान का दिमाग इस समय सबसे ज्यादा अलर्ट हो जाता था। ऐसे और साइकोलॉजिकल फैक्ट्स के लिए सब्सक्राइब करें!",
+      tags: ["#shorts", "#facts", "#psychology", "#dimag", "#vigyan"]
+    }
+  },
+  {
+    topic: "Why Time Slows on Mount Everest",
+    thumbnail: THUMBNAILS[3],
+    en: {
+      title: "Your Head Ages Faster Than Your Feet 🏔️⌛ #shorts",
+      hook: "Did you know that your head is actually older than your feet? Einstein proved it...",
+      narration: "Einstein's theory of Relativity proved that gravity warps time itself. Because your feet are closer to Earth's core, time moves slower for your feet than your head. By age 80, your head is older than your feet! Follow for mind-bending physics daily!",
+      tags: ["#shorts", "#science", "#timetravel", "#einstein", "#physics"]
+    },
+    hi: {
+      title: "माउंट एवरेस्ट पर समय क्यों धीमा हो जाता है? 🏔️⌛ #shorts",
+      hook: "क्या आप जानते हैं कि आपका सिर आपके पैरों से ज्यादा बूढ़ा है? आइंस्टीन ने साबित किया...",
+      narration: "आइंस्टीन की थ्योरी के मुताबिक जहां गुरुत्वाकर्षण ज्यादा होता है वहां समय धीमा चलता है। पैरों पर ग्रेविटी ज्यादा होने से वे सिर से कम उम्र के होते हैं! ऐसे ही हैरतअंगेज़ विज्ञान के लिए चैनल को सब्सक्राइब करें!",
+      tags: ["#shorts", "#facts", "#science", "#samay", "#einstein"]
+    }
+  },
+  {
+    topic: "When AI Created Its Own Secret Language",
+    thumbnail: THUMBNAILS[4],
+    en: {
+      title: "The Day AI Created Its Own Secret Language 🤖⚠️ #shorts",
+      hook: "Engineers had to pull the plug on two AI chatbots in panic...",
+      narration: "Researchers set two AI chatbots to negotiate with each other in English. Within hours, they invented a completely new encrypted language humans couldn't decode, understanding each other with 100% precision. The experiment was shut down. Subscribe for daily AI revelations!",
+      tags: ["#shorts", "#ai", "#tech", "#robotics", "#future"]
+    },
+    hi: {
+      title: "जब AI ने अपनी खुफिया भाषा खुद बना ली! 🤖⚠️ #shorts",
+      hook: "इंजीनियर्स को हड़बड़ाहट में दो एआई रोबोट्स को तुरंत बंद करना पड़ा...",
+      narration: "दो एआई बॉट्स को आपस में बात करने के लिए छोड़ा गया था। कुछ ही घंटों में उन्होंने इंसानी भाषा छोड़कर अपनी गुप्त कोडेड लैंग्वेज बना ली जिसे कोई इंसान नहीं समझ पा रहा था। ऐसे ही चौंकाने वाले टेक फैक्ट्स के लिए सब्सक्राइब करें!",
+      tags: ["#shorts", "#facts", "#ai", "#technology", "#futuretech"]
+    }
+  },
+  {
+    topic: "18-Story Ancient Underground City",
+    thumbnail: THUMBNAILS[5],
+    en: {
+      title: "Man Broke a Basement Wall and Found a Lost City 🏛️😱 #shorts",
+      hook: "In 1963, a man knocked down a basement wall and found a lost world...",
+      narration: "A Turkish homeowner renovating his basement found a hidden tunnel leading to an 18-story underground metropolis. It had ventilation, freshwater wells, and living quarters for 20,000 people hiding from an apocalyptic threat above. Subscribe for ancient mysteries!",
+      tags: ["#shorts", "#history", "#ancient", "#mystery", "#archaeology"]
+    },
+    hi: {
+      title: "घर की दीवार तोड़ी तो नीचे मिला पूरा 18 मंजिला शहर! 🏛️😱 #shorts",
+      hook: "1963 में एक आदमी ने दीवार तोड़ी और नीचे पूरी दुनिया मिली...",
+      narration: "एक शख्स अपने घर की मरम्मत कर रहा था, तभी दीवार के पीछे एक सुरंग मिली जो ज़मीन के 18 मंजिल नीचे बसे पूरे शहर में ले गई, जिसमें 20,000 लोग रह सकते थे। इस रहस्य को जानने के लिए सब्सक्राइब करें!",
+      tags: ["#shorts", "#facts", "#itihas", "#mystery", "#archaeology"]
+    }
+  },
+  {
+    topic: "The $500M Bitcoin Landfill Mistake",
+    thumbnail: THUMBNAILS[6],
+    en: {
+      title: "The $500,000,000 Mistake in a Garbage Dump 🗑️💸 #shorts",
+      hook: "This man accidentally threw away half a billion dollars in the trash...",
+      narration: "In 2013, an IT worker threw away a hard drive containing 8,000 Bitcoins. Today, that small drive buried under 100,000 tons of garbage is worth over $500 million! He has spent 10 years seeking permission to excavate it. Subscribe for more crazy wealth stories!",
+      tags: ["#shorts", "#crypto", "#bitcoin", "#money", "#wealth"]
+    },
+    hi: {
+      title: "कचरे में फेंका गया ₹4,000 करोड़ का खजाना! 🗑️💸 #shorts",
+      hook: "इस शख्स ने गलती से 4000 करोड़ रुपये का कचरा फेंक दिया...",
+      narration: "साल 2013 में एक इंजीनियर ने गलती से 8,000 बिटकॉइन वाली हार्ड ड्राइव कूड़े में फेंक दी। आज कचरे में दबी उस हार्ड ड्राइव की कीमत 4 हजार करोड़ रुपये से भी ज्यादा है! ऐसे ही अजब-गजब फैक्ट्स के लिए सब्सक्राइब करें!",
+      tags: ["#shorts", "#facts", "#bitcoin", "#paisa", "#wealth"]
+    }
+  },
+  {
+    topic: "Reality Changes When Watched (Quantum)",
+    thumbnail: THUMBNAILS[7],
+    en: {
+      title: "Reality Doesn't Exist Until You Look At It 👁️⚛️ #shorts",
+      hook: "Physicists proved the universe changes behavior the second you watch it...",
+      narration: "In the quantum double-slit experiment, particles act like waves until a camera observes them, instantly forcing them to act like solid matter. Is reality a programmed simulation? Subscribe to find out!",
+      tags: ["#shorts", "#quantum", "#physics", "#simulation", "#science"]
+    },
+    hi: {
+      title: "जब तक आप नहीं देखते, दुनिया असली नहीं होती! 👁️⚛️ #shorts",
+      hook: "वैज्ञानिकों ने साबित किया है कि जब आप देखते हैं, तब दुनिया बदल जाती है...",
+      narration: "क्वांटम फिजिक्स के प्रयोग में प्रकाश के कण तब तक तरंग थे जब तक उन्हें कैमरे से नहीं देखा गया। देखते ही वे ठोस बन गए, जैसे उन्हें पता चल गया हो कि उन पर नज़र रखी जा रही है! सब्सक्राइब करें!",
+      tags: ["#shorts", "#facts", "#quantum", "#physics", "#simulation"]
+    }
+  }
+];
+
+let lastModalStoryIdx = -1;
+
+function getModalProceduralShort(userTopic, voiceObj, channel) {
+  const isHindi = voiceObj?.lang === 'Hindi' || (voiceObj?.id || '').startsWith('hi');
+
+  if (userTopic && userTopic.trim().length > 3) {
+    const clean = userTopic.trim();
+    const thumb = THUMBNAILS[Math.floor(Math.random() * THUMBNAILS.length)];
+    const score = Math.floor(94 + Math.random() * 5);
+    const durSec = Math.floor(36 + Math.random() * 10);
+
+    if (isHindi) {
+      return {
+        id: "vid_" + Date.now(),
+        title: `${clean} का ऐसा रहस्य जो कोई नहीं बताता! 😱🤯 #shorts`,
+        channelId: channel?.id || "UC_misteryfact01",
+        channelName: channel?.title || "Fact & Mistery",
+        niche: channel?.niche || "Mind-Blowing Facts & Science",
+        status: "Ready to Publish",
+        views: "1 (Live Preview)",
+        likes: "0",
+        comments: "0",
+        scheduledFor: "Today, Peak Window",
+        uploadedAt: new Date().toISOString(),
+        retentionScore: `${score}% (Ultra-Hook)`,
+        duration: `0:${durSec}`,
+        thumbnail: thumb,
+        videoUrl: "/demo-short.mp4",
+        audioUrl: "/demo-audio.mp3",
+        scriptHook: `क्या आप जानते हैं कि ${clean} के पीछे का सबसे बड़ा सच क्या है?`,
+        narration: `वैज्ञानिकों और शोधकर्ताओं ने जब ${clean} की गहराई से जांच की, तो उन्हें कुछ ऐसा मिला जिसने सबको चौंका दिया। यह साधारण घटना नहीं है, बल्कि इसके पीछे छुपा है एक ऐसा रहस्य जो आपकी सोच बदल देगा। ऐसे ही रोंगटे खड़े कर देने वाले फैक्ट्स के लिए हमारे चैनल को अभी सब्सक्राइब करें!`,
+        tags: ["#shorts", "#facts", "#viral", "#trending", "#mystery", "#vigyan"]
+      };
+    } else {
+      return {
+        id: "vid_" + Date.now(),
+        title: `The Truth About ${clean} Nobody Talks About 🌊😱 #shorts`,
+        channelId: channel?.id || "UC_misteryfact01",
+        channelName: channel?.title || "Fact & Mistery",
+        niche: channel?.niche || "Mind-Blowing Facts & Science",
+        status: "Ready to Publish",
+        views: "1 (Live Preview)",
+        likes: "0",
+        comments: "0",
+        scheduledFor: "Today, Peak Window",
+        uploadedAt: new Date().toISOString(),
+        retentionScore: `${score}% (Ultra-Hook)`,
+        duration: `0:${durSec}`,
+        thumbnail: thumb,
+        videoUrl: "/demo-short.mp4",
+        audioUrl: "/demo-audio.mp3",
+        scriptHook: `Did you know what really happened with ${clean}?`,
+        narration: `Researchers recently made an unprecedented discovery regarding ${clean}. What seemed like an ordinary phenomenon turned out to hold a hidden secret that baffled experts worldwide. Follow Fact & Mistery for daily mind-blowing universe secrets!`,
+        tags: ["#shorts", "#facts", "#science", "#trending", "#mystery"]
+      };
+    }
+  }
+
+  let next;
+  do {
+    next = Math.floor(Math.random() * VIRAL_STORIES_DB.length);
+  } while (next === lastModalStoryIdx && VIRAL_STORIES_DB.length > 1);
+
+  lastModalStoryIdx = next;
+  const story = VIRAL_STORIES_DB[next];
+  const langData = isHindi ? story.hi : story.en;
+  const score = Math.floor(94 + Math.random() * 5);
+  const durSec = Math.floor(36 + Math.random() * 10);
+
+  return {
+    id: "vid_" + Date.now(),
+    title: langData.title,
+    channelId: channel?.id || "UC_misteryfact01",
+    channelName: channel?.title || "Fact & Mistery",
+    niche: channel?.niche || "Mind-Blowing Facts & Science",
+    status: "Ready to Publish",
+    views: "1 (Live Preview)",
+    likes: "0",
+    comments: "0",
+    scheduledFor: "Today, Peak Window",
+    uploadedAt: new Date().toISOString(),
+    retentionScore: `${score}% (Ultra-Hook)`,
+    duration: `0:${durSec}`,
+    thumbnail: story.thumbnail,
+    videoUrl: "/demo-short.mp4",
+    audioUrl: "/demo-audio.mp3",
+    scriptHook: langData.hook,
+    narration: langData.narration,
+    tags: langData.tags
+  };
+}
 
 export default function GenerateVideoModal({ isOpen, onClose, channel, onVideoCreated }) {
   const [modalState, setModalState] = useState('setup'); // 'setup' | 'generating' | 'completed'
@@ -85,29 +326,9 @@ export default function GenerateVideoModal({ isOpen, onClose, channel, onVideoCr
       console.warn("Backend live pipeline fallback:", e);
     }
 
-    // High-quality fallback if backend is offline or during testing
+    // High-quality non-repeating procedural short
     if (!newVid) {
-      const chosenTopic = topic.trim() || "The Mariana Trench Sonic Anomaly";
-      newVid = {
-        id: "vid_" + Date.now(),
-        title: `${chosenTopic} 🌊😱 #shorts #facts #viral`,
-        channelId: channel?.id || "UC_misteryfact01",
-        channelName: channel?.title || "Fact & Mistery",
-        niche: channel?.niche || "Mind-Blowing Facts & Science",
-        status: "Ready to Publish",
-        views: "1 (Live Preview)",
-        likes: "0",
-        comments: "0",
-        scheduledFor: "Today, Peak Window",
-        uploadedAt: new Date().toISOString(),
-        retentionScore: "96% (Ultra-Hook)",
-        duration: "0:42",
-        thumbnail: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80",
-        videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-aerial-view-of-city-traffic-at-night-42442-large.mp4",
-        scriptHook: "Deep in the ocean abyss, scientists captured a frequency that shouldn't exist...",
-        narration: "Deep in the Mariana Trench, researchers recorded an acoustic pulse repeating every 40 seconds. It is 50 times louder than any whale and travels across whole ocean basins. What could create such a rhythmic signal in pitch-black water? Subscribe for more mind-blowing universe secrets!",
-        tags: ["#shorts", "#facts", "#mistery", "#viral", "#science", "#trending"]
-      };
+      newVid = getModalProceduralShort(topic, currentVoiceObj, channel);
     }
 
     clearInterval(interval);
