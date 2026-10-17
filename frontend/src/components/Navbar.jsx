@@ -61,15 +61,21 @@ export default function Navbar({ onOpenAuth, onOpenDashboard, isLoggedIn, curren
         <div className="flex items-center gap-3">
           {currentView === 'landing' ? (
             <button
-              onClick={() => setCurrentView('dashboard')}
-              className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-white/10 hover:bg-white/15 text-white border border-white/10 transition shadow-card"
+              onClick={() => {
+                localStorage.setItem('neoshort_preferred_view', 'app');
+                setCurrentView('app');
+              }}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-gradient-to-r from-[#ff2d55] to-[#c70039] hover:from-[#ff4065] hover:to-[#e50914] text-white border border-white/10 transition shadow-neo transform hover:scale-[1.02]"
             >
-              <LayoutDashboard className="w-4 h-4 text-[#ff2d55]" />
-              Open Dashboard
+              <Sparkles className="w-4 h-4 fill-white" />
+              <span>Launch Studio App</span>
             </button>
           ) : (
             <button
-              onClick={() => setCurrentView('landing')}
+              onClick={() => {
+                localStorage.setItem('neoshort_preferred_view', 'landing');
+                setCurrentView('landing');
+              }}
               className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/15 text-white border border-white/10 transition"
             >
               Home Page
@@ -79,12 +85,13 @@ export default function Navbar({ onOpenAuth, onOpenDashboard, isLoggedIn, curren
           <button
             onClick={() => {
               if (isLoggedIn) {
-                setCurrentView('dashboard');
+                localStorage.setItem('neoshort_preferred_view', 'app');
+                setCurrentView('app');
               } else {
                 onOpenAuth('login');
               }
             }}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold bg-gradient-to-r from-[#ff2d55] to-[#c70039] hover:from-[#ff4065] hover:to-[#e50914] text-white shadow-neo transition transform hover:scale-[1.02] active:scale-[0.98]"
+            className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold bg-white/10 hover:bg-white/15 text-white border border-white/10 transition"
           >
             {isLoggedIn ? (
               <>

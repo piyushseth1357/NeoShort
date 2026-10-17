@@ -25,27 +25,27 @@ const STORAGE_KEYS = {
 
 const defaultChannels = [
   {
-    id: "UC_demo_987654321",
-    title: "NeoFacts Official",
-    handle: "@neofactsofficial",
-    subscribers: "12.4K",
+    id: "UC_misteryfact01",
+    title: "Fact & Mistery",
+    handle: "@MisteryFact-01",
+    subscribers: "1.2K (Verified)",
     avatar: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150&auto=format&fit=crop&q=80",
     niche: "Mind-Blowing Facts & Science",
     status: "Connected & Active",
     autoMode: true,
     bestPostingTime: "18:45 IST (Peak Engagement)",
-    dailyUploadLimit: 2,
+    dailyUploadLimit: 1,
     lastUploaded: "Today, 18:45 IST",
-    totalUploads: 28
+    totalUploads: 4
   }
 ];
 
 const defaultVideos = [
   {
     id: "vid_101",
-    title: "Why Time Moves Slower on Mount Everest 🏔️⌛ #shorts #facts #science",
-    channelId: "UC_demo_987654321",
-    channelName: "NeoFacts Official",
+    title: "The Mariana Trench Mystery Nobody Talks About 🌊😱 #shorts #facts",
+    channelId: "UC_misteryfact01",
+    channelName: "Fact & Mistery",
     niche: "Mind-Blowing Facts & Science",
     status: "Uploaded",
     views: "184.2K",
@@ -53,18 +53,21 @@ const defaultVideos = [
     comments: "492",
     scheduledFor: "Today, 18:45 IST",
     uploadedAt: "Today, 18:45 IST",
-    retentionScore: "89% (High Retention)",
+    retentionScore: "96% (High Retention)",
     duration: "0:42",
-    thumbnail: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&auto=format&fit=crop&q=80",
-    scriptHook: "Did you know that your head ages faster than your feet? Einstein proved it...",
-    tags: ["#shorts", "#facts", "#science", "#timetravel", "#mindblown", "#trending"]
+    thumbnail: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80",
+    videoUrl: "/demo-short.mp4",
+    audioUrl: "/demo-audio.mp3",
+    scriptHook: "Deep in the ocean abyss, scientists captured a frequency that shouldn't exist...",
+    narration: "Scientists sent an autonomous submarine 30,000 feet into the Mariana Trench. At first, all they saw was pitch-black darkness. But suddenly, strange acoustic frequencies registered on their sonars. What they captured wasn't a whale or volcanic rumble—it was an artificial pattern repeated every 40 seconds. To this day, oceanographers cannot explain what created it. Follow for more mind-bending ocean mysteries!",
+    tags: ["#shorts", "#facts", "#science", "#mystery", "#mindblown", "#trending"]
   },
   {
     id: "vid_102",
-    title: "The Bizarre AI Discovery Nobody Talks About 🤖🤯 #shorts #ai #tech",
-    channelId: "UC_demo_987654321",
-    channelName: "NeoFacts Official",
-    niche: "AI & Tech News",
+    title: "Why Time Moves Slower on Mount Everest 🏔️⌛ #shorts #facts #science",
+    channelId: "UC_misteryfact01",
+    channelName: "Fact & Mistery",
+    niche: "Mind-Blowing Facts & Science",
     status: "Scheduled",
     views: "Queued",
     likes: "-",
@@ -73,9 +76,12 @@ const defaultVideos = [
     uploadedAt: null,
     retentionScore: "94% (Predicted Retention)",
     duration: "0:38",
-    thumbnail: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=600&auto=format&fit=crop&q=80",
-    scriptHook: "Quantum computers just simulated something that shouldn't exist in our universe...",
-    tags: ["#shorts", "#ai", "#technology", "#futuretech", "#quantum"]
+    thumbnail: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&auto=format&fit=crop&q=80",
+    videoUrl: "/demo-short.mp4",
+    audioUrl: "/demo-audio.mp3",
+    scriptHook: "Did you know that your head ages faster than your feet? Einstein proved it...",
+    narration: "Did you know that your head ages faster than your feet? Einstein proved that gravity bends time itself. On top of Mount Everest, time moves measurably faster than at sea level. Subscribe for daily universe secrets!",
+    tags: ["#shorts", "#facts", "#science", "#timetravel", "#mindblown"]
   }
 ];
 
@@ -90,11 +96,11 @@ export default function App() {
       const saved = localStorage.getItem(STORAGE_KEYS.USER);
       return saved ? JSON.parse(saved) : {
         id: "usr_creator",
-        name: "Creator",
-        email: "creator@neoshort.ai"
+        name: "Fact & Mistery Creator",
+        email: "misteryfact01@gmail.com"
       };
     } catch {
-      return { id: "usr_creator", name: "Creator", email: "creator@neoshort.ai" };
+      return { id: "usr_creator", name: "Fact & Mistery Creator", email: "misteryfact01@gmail.com" };
     }
   });
 
@@ -137,23 +143,38 @@ export default function App() {
     }
   });
 
-  // View Mode: Installed APK/PWA opens Native App directly; Web browser opens Landing Page with Download section
+  // View Mode: Installed APK/PWA opens Native App directly; Web browser opens Landing Page
   const [currentView, setCurrentView] = useState(() => {
     try {
+      const urlParams = new URLSearchParams(window.location.search);
+      // Query parameters from APK / shortcut / launch
+      if (
+        urlParams.get('source') === 'app' || 
+        urlParams.get('mode') === 'studio' || 
+        urlParams.get('mode') === 'app' || 
+        urlParams.get('source') === 'apk' ||
+        urlParams.get('view') === 'app' ||
+        urlParams.get('channel_connected') === 'true'
+      ) {
+        localStorage.setItem('neoshort_preferred_view', 'app');
+        return 'app';
+      }
+
+      // Check standalone PWA / TWA environment
       const isStandaloneApp = typeof window !== 'undefined' && (
         window.matchMedia('(display-mode: standalone)').matches ||
         window.navigator.standalone === true ||
-        document.referrer.includes('android-app://') ||
-        window.location.search.includes('source=apk') ||
-        window.location.search.includes('mode=app')
+        document.referrer.includes('android-app://')
       );
       if (isStandaloneApp) {
+        localStorage.setItem('neoshort_preferred_view', 'app');
         return 'app';
       }
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('view') === 'app' || urlParams.get('channel_connected') === 'true') {
-        return 'app';
-      }
+
+      // User preference
+      const savedView = localStorage.getItem('neoshort_preferred_view') || localStorage.getItem(STORAGE_KEYS.CURRENT_VIEW);
+      if (savedView === 'app') return 'app';
+
       return 'landing';
     } catch {
       return 'landing';

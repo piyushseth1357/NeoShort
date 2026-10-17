@@ -14,8 +14,8 @@ export default function ShortsPreview() {
       views: "184.2K",
       likes: "14.3K",
       comments: "492",
-      bgVideo: "https://assets.mixkit.co/videos/preview/mixkit-flying-over-mount-everest-during-sunrise-41712-large.mp4",
-      bgImage: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&auto=format&fit=crop&q=80",
+      bgVideo: "/demo-short.mp4",
+      bgImage: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80",
       voiceStyle: "Deep American Documentary (Male)",
       retentionRate: "89% Watch Time"
     },

@@ -8,9 +8,9 @@ ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 
 /**
  * Renders a compliant 9:16 vertical YouTube Short MP4
- * Combines generated neural audio with vertical 1080x1920 visual layout
+ * Combines generated neural audio with 1080x1920 visual layout and animated neon waveform
  */
-export function renderShortVideo({ audioPath, outputPath, duration }) {
+export function renderShortVideo({ audioPath, outputPath, title = "NeoShort AI", bgImage = null }) {
   return new Promise((resolve, reject) => {
     if (!fs.existsSync(audioPath)) {
       return reject(new Error(`Audio file not found at ${audioPath}`));
@@ -21,23 +21,54 @@ export function renderShortVideo({ audioPath, outputPath, duration }) {
       fs.mkdirSync(outputDir, { recursive: true });
     }
 
-    // Build 1080x1920 vertical canvas with gradient background and 30fps
-    // -f lavfi -i color=c=0x0e0e17:s=1080x1920:r=30
-    ffmpeg()
-      .input('color=c=0x0d0d17:s=1080x1920:r=30')
-      .inputFormat('lavfi')
-      .input(audioPath)
-      .outputOptions([
-        '-c:v libx264',
-        '-pix_fmt yuv420p',
-        '-c:a aac',
-        '-b:a 192k',
-        '-shortest', // Stop video when audio ends
-        '-movflags +faststart'
-      ])
+    // Default background: sleek vertical gradient canvas
+    const cmd = ffmpeg();
+
+    if (bgImage && fs.existsSync(bgImage)) {
+      cmd
+        .input(bgImage)
+        .loop()
+        .input(audioPath)
+        .complexFilter([
+          '[0:v]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920[bg]',
+          '[1:a]showwaves=s=920x220:mode=cline:colors=0xff2d55|0xffffff:rate=30[wave]',
+          '[bg][wave]overlay=(W-w)/2:H-h-240[outv]'
+        ])
+        .outputOptions([
+          '-map [outv]',
+          '-map 1:a',
+          '-c:v libx264',
+          '-pix_fmt yuv420p',
+          '-c:a aac',
+          '-b:a 192k',
+          '-shortest',
+          '-movflags +faststart'
+        ]);
+    } else {
+      cmd
+        .input('color=c=0x0a0a14:s=1080x1920:r=30')
+        .inputFormat('lavfi')
+        .input(audioPath)
+        .complexFilter([
+          '[1:a]showwaves=s=920x260:mode=cline:colors=0xff2d55|0xffffff:rate=30[wave]',
+          '[0:v][wave]overlay=(W-w)/2:(H-h)/2[outv]'
+        ])
+        .outputOptions([
+          '-map [outv]',
+          '-map 1:a',
+          '-c:v libx264',
+          '-pix_fmt yuv420p',
+          '-c:a aac',
+          '-b:a 192k',
+          '-shortest',
+          '-movflags +faststart'
+        ]);
+    }
+
+    cmd
       .output(outputPath)
-      .on('start', (cmd) => {
-        console.log('[FFmpeg] Compiling 9:16 vertical Short:', cmd);
+      .on('start', (commandLine) => {
+        console.log('[FFmpeg] Compiling 9:16 vertical Short:', commandLine);
       })
       .on('end', () => {
         console.log('[FFmpeg] Short successfully compiled to:', outputPath);

@@ -3,7 +3,7 @@
   "name": "NeoShort AI — Autonomous YouTube Shorts Creator",
   "short_name": "NeoShort",
   "description": "Auto-generate and auto-upload daily YouTube Shorts for your channels on peak audience viewing hours.",
-  "start_url": "/",
+  "start_url": "/?source=app&mode=studio",
   "scope": "/",
   "display": "standalone",
   "display_override": [

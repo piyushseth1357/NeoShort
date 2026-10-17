@@ -130,8 +130,8 @@ export default function StudioApp({
         uploadedAt: new Date().toISOString(),
         retentionScore: "96% (Ultra-Hook)",
         duration: "0:42",
-        thumbnail: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80",
-        videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-aerial-view-of-city-traffic-at-night-42442-large.mp4",
+        videoUrl: "/demo-short.mp4",
+        audioUrl: "/demo-audio.mp3",
         scriptHook: "Deep in the ocean abyss, scientists captured a frequency that shouldn't exist...",
         narration: "Deep in the Mariana Trench, researchers recorded an acoustic pulse repeating every 40 seconds. It is 50 times louder than any whale and travels across whole ocean basins. What could create such a rhythmic signal in pitch-black water? Subscribe for more mind-blowing universe secrets!",
         tags: ["#shorts", "#facts", "#mistery", "#viral", "#science", "#trending"]
@@ -230,8 +230,19 @@ export default function StudioApp({
             </div>
           </div>
 
-          {/* Active Channel Chip */}
+          {/* Active Channel Chip & Website Toggle */}
           <div className="flex items-center gap-2">
+            {onExitApp && (
+              <button
+                onClick={onExitApp}
+                title="View Website Landing Page"
+                className="flex items-center gap-1.5 py-1.5 px-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 text-xs font-semibold transition"
+              >
+                <Globe className="w-3.5 h-3.5 text-[#ff2d55]" />
+                <span className="hidden sm:inline">Website</span>
+              </button>
+            )}
+
             <button
               onClick={onOpenConnectChannel}
               className="flex items-center gap-2 py-1.5 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition"

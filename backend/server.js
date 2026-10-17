@@ -366,11 +366,12 @@ app.post('/api/pipeline/generate-and-upload', async (req, res) => {
         const mp4Path = path.join(outputDir, 'short.mp4');
         await renderShortVideo({
           audioPath: voiceResult.audioPath,
-          outputPath: mp4Path
+          outputPath: mp4Path,
+          title: script.title
         });
         renderedVideoPath = mp4Path;
       } catch (renderErr) {
-        console.warn("Video render fallback:", renderErr.message);
+        console.warn("Video render error:", renderErr.message);
       }
     }
 
