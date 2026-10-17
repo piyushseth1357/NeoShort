@@ -82,7 +82,7 @@ export default function DownloadSection() {
                 className="w-full py-3.5 px-6 rounded-xl font-bold text-sm bg-gradient-to-r from-[#ff2d55] to-[#c70039] hover:from-[#ff4065] hover:to-[#e50914] text-white shadow-neo flex items-center justify-center gap-2.5 transition active:scale-95 text-center"
               >
                 <ArrowDownToLine className="w-4 h-4" />
-                <span>Download Android APK (3.2 MB)</span>
+                <span>Download Android APK (33 MB)</span>
               </a>
               <p className="text-[11px] text-gray-500 text-center mt-2.5">
                 Safe & Verified APK • Direct Install for All Android Phones
