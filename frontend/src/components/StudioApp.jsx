@@ -288,8 +288,63 @@ export default function StudioApp({
   const [showUploadGuide, setShowUploadGuide] = useState(false);
   const [autoPilotEnabled, setAutoPilotEnabled] = useState(true);
   const [selectedNiche, setSelectedNiche] = useState(activeChannel?.niche || "Mind-Blowing Facts & Science");
-  const [countdownText, setCountdownText] = useState('');
   const [playingVideoModal, setPlayingVideoModal] = useState(null);
+
+  // In-App Auto Update & Cache-Sync Engine
+  const [updateInfo, setUpdateInfo] = useState(null);
+  const [checkingUpdate, setCheckingUpdate] = useState(false);
+  const [updateStatus, setUpdateStatus] = useState(null); // 'latest' | 'available' | 'error' | null
+  const [hasNewUpdate, setHasNewUpdate] = useState(false);
+
+  const checkForAppUpdates = async (isManual = false) => {
+    if (isManual) setCheckingUpdate(true);
+    try {
+      const res = await fetch(`/version.json?t=${Date.now()}`, { cache: 'no-store' });
+      if (res.ok) {
+        const data = await res.json();
+        setUpdateInfo(data);
+        const currentVersion = "1.2.0";
+        if (data.version && data.version !== currentVersion) {
+          setHasNewUpdate(true);
+          setUpdateStatus('available');
+        } else {
+          setUpdateStatus('latest');
+        }
+      } else {
+        if (isManual) setUpdateStatus('latest');
+      }
+    } catch (e) {
+      console.warn("Update check failed", e);
+      if (isManual) setUpdateStatus('error');
+    } finally {
+      if (isManual) setTimeout(() => setCheckingUpdate(false), 600);
+    }
+  };
+
+  const handleForceUpdateAndClearCache = async () => {
+    try {
+      if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        for (let reg of registrations) {
+          await reg.unregister();
+        }
+      }
+      if ('caches' in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map(k => caches.delete(k)));
+      }
+      localStorage.removeItem('neoshort_v4_cache');
+      window.location.reload(true);
+    } catch (e) {
+      window.location.reload();
+    }
+  };
+
+  useEffect(() => {
+    checkForAppUpdates(false);
+    const interval = setInterval(() => checkForAppUpdates(false), 30 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const stages = [
     { title: "Analyzing YouTube Viral Trends", desc: `Scanning high-retention topics in ${activeChannel?.niche || "Facts"}` },
@@ -484,6 +539,34 @@ export default function StudioApp({
 
         </div>
       </header>
+
+      {/* ⚡ IN-APP UPDATE NOTIFICATION BANNER */}
+      {hasNewUpdate && (
+        <div className="bg-gradient-to-r from-[#ff2d55] to-[#c70039] text-white px-4 py-2.5 text-xs font-bold flex flex-wrap items-center justify-between gap-2 shadow-neo animate-fadeIn">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 animate-spin text-amber-300" />
+            <span>Naya Version {updateInfo?.version || '1.2.0'} Available Hai!</span>
+            <span className="hidden sm:inline text-white/80 font-normal">({updateInfo?.apkSize || '33 MB'})</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleForceUpdateAndClearCache}
+              className="py-1 px-3 rounded-lg bg-black/40 hover:bg-black/60 text-white text-[11px] font-bold transition flex items-center gap-1"
+            >
+              <RefreshCw className="w-3 h-3" />
+              <span>Sync Now</span>
+            </button>
+            <a
+              href="/neoshort.apk"
+              download="NeoShort.apk"
+              className="py-1 px-3 rounded-lg bg-white text-black hover:bg-gray-100 text-[11px] font-bold transition flex items-center gap-1 shadow-sm"
+            >
+              <Download className="w-3 h-3 text-[#ff2d55]" />
+              <span>Download APK</span>
+            </a>
+          </div>
+        </div>
+      )}
 
       {/* 🧭 DESKTOP / TABLET TAB BAR */}
       <nav className="hidden md:flex bg-[#0a0a10] border-b border-white/5 px-4 py-2">
@@ -1122,6 +1205,85 @@ export default function StudioApp({
                 className="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10 transition mt-2"
               >
                 Switch or Link Another Channel
+              </button>
+            </div>
+
+            {/* App Updates & Version Card */}
+            <div className="p-5 rounded-3xl bg-[#11111a] border border-white/10 shadow-card space-y-3.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">App Updates & Version</span>
+                <span className="px-2.5 py-0.5 rounded-full bg-blue-500/15 text-blue-400 text-[10px] font-bold border border-blue-500/30">
+                  Auto-Sync Active
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between p-3 rounded-2xl bg-white/5 border border-white/5">
+                <div>
+                  <p className="text-white font-bold text-sm">NeoShort Studio v1.2.0</p>
+                  <p className="text-[11px] text-gray-400">Release Build: 2026.10.19 (Stable)</p>
+                </div>
+                <div className="text-right">
+                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-400">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span>Up to Date</span>
+                  </span>
+                </div>
+              </div>
+
+              {/* Status Feedback */}
+              {updateStatus === 'latest' && (
+                <p className="text-xs text-emerald-400 flex items-center gap-1.5 bg-emerald-500/10 p-2.5 rounded-xl border border-emerald-500/20">
+                  <CheckCircle2 className="w-4 h-4 shrink-0" />
+                  <span>Aapka app bilkul latest version par hai! Koi naya update pending nahi hai.</span>
+                </p>
+              )}
+              {updateStatus === 'available' && (
+                <div className="p-3 rounded-xl bg-gradient-to-r from-red-950/40 to-[#ff2d55]/20 border border-[#ff2d55]/40 space-y-1.5">
+                  <p className="text-xs font-bold text-white flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-[#ff2d55]" />
+                    <span>Naya Update Available: v{updateInfo?.version || '1.2.0'}</span>
+                  </p>
+                  <p className="text-[11px] text-gray-300">
+                    {updateInfo?.releaseNotes?.[0] || 'Naye features aur performance fixes shamil hain.'}
+                  </p>
+                </div>
+              )}
+              {updateStatus === 'error' && (
+                <p className="text-xs text-amber-400 flex items-center gap-1.5 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>Update check karne me problem aayi. Kripya apna internet connection check karein.</span>
+                </p>
+              )}
+
+              {/* Action Buttons */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => checkForAppUpdates(true)}
+                  disabled={checkingUpdate}
+                  className="py-2.5 px-3 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/15 text-white border border-white/10 transition flex items-center justify-center gap-2"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${checkingUpdate ? 'animate-spin text-[#ff2d55]' : ''}`} />
+                  <span>{checkingUpdate ? 'Checking...' : 'Check for Updates'}</span>
+                </button>
+
+                <a
+                  href="/neoshort.apk"
+                  download="NeoShort.apk"
+                  className="py-2.5 px-3 rounded-xl text-xs font-bold bg-gradient-to-r from-[#ff2d55] to-[#c70039] hover:from-[#ff4065] hover:to-[#e50914] text-white shadow-neo transition flex items-center justify-center gap-2"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Download Latest APK (33 MB)</span>
+                </a>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleForceUpdateAndClearCache}
+                className="w-full py-2 px-3 rounded-xl text-[11px] font-semibold text-gray-400 hover:text-gray-200 bg-black/20 hover:bg-black/40 border border-white/5 transition flex items-center justify-center gap-1.5"
+              >
+                <Zap className="w-3 h-3 text-amber-400" />
+                <span>Force Refresh & Clear Local Cache</span>
               </button>
             </div>
 

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'neoshort-v3';
+const CACHE_NAME = 'neoshort-v4';
 const STATIC_ASSETS = [
   '/manifest.json',
   '/logo.png',
@@ -8,6 +8,12 @@ const STATIC_ASSETS = [
   '/screenshot-wide.png',
   '/screenshot-mobile.png'
 ];
+
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -35,8 +41,13 @@ self.addEventListener('fetch', (event) => {
   const req = event.request;
   const url = new URL(req.url);
 
-  // Bypass non-GET and API / cross-origin requests
-  if (req.method !== 'GET' || url.pathname.startsWith('/api')) {
+  // Bypass non-GET, API, version.json, and APK downloads from caching
+  if (
+    req.method !== 'GET' || 
+    url.pathname.startsWith('/api') || 
+    url.pathname.endsWith('/version.json') ||
+    url.pathname.endsWith('.apk')
+  ) {
     return;
   }
 
